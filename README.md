@@ -39,7 +39,8 @@ linear-algebra-course/
 ├── 02-intermediate/      # Scenes for the Intermediate playlist
 ├── 03-advanced/          # Scenes for the Advanced playlist
 ├── assets/               # Fonts, images, static resources
-└── requirements.txt
+├── pyproject.toml
+└── uv.lock
 ```
 
 Each video's scene lives in its own file, numbered to match its position in the playlist (e.g. `01-foundational/02_matrix_multiplication.py`).
@@ -50,24 +51,34 @@ Each video's scene lives in its own file, numbered to match its position in the 
 
 - **[Manim Community Edition](https://www.manim.community/)** — mathematical animation engine (Python)
 - **Python 3.10+**
+- **[uv](https://docs.astral.sh/uv/)** — dependency & environment management
 
 ---
 
 ## 🚀 Getting Started
+
+### Using `uv` (recommended — fast ⚡)
 
 ```bash
 # Clone the repo
 git clone https://github.com/ahmed-abualsaud/linear-algebra-course.git
 cd linear-algebra-course
 
-# Set up a virtual environment
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-
-# Install dependencies
-pip install -r requirements.txt
+# Sync dependencies and create the environment automatically
+uv sync
 
 # Render a scene (low quality preview)
+uv run manim -pql 01-foundational/01_vectors.py VectorsScene
+```
+
+### Using `pip`
+
+```bash
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+
+pip install -e .
+
 manim -pql 01-foundational/01_vectors.py VectorsScene
 ```
 
