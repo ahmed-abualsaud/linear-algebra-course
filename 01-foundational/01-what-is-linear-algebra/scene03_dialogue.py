@@ -1,5 +1,4 @@
 from manim import *
-from common.identity import turn_off_neon
 from common.mobjects import mach_stick_figure, speech_bubble
 from common.palette import GOLD_LIGHT, STONE_AXIS
 
@@ -59,9 +58,6 @@ def play_scene03(scene):
         font_size=19,
         shift=LEFT * 0.85,
     )
-
-    turn_off_neon(scene, run_time=0.6)
-
 
     # ==============================================================
     # 4. ظهور الشخصيتين

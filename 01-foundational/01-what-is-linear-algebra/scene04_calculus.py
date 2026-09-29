@@ -1,5 +1,4 @@
 from manim import *
-
 from common.mobjects.coordinate_systems import MachAxes
 
 from common.palette import (

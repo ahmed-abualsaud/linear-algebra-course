@@ -1,7 +1,8 @@
 from manim import *
+from common.identity import turn_off_neon
+from common.latex import mach_math_template
 from common.mobjects.coordinate_systems import MachNumberLine
 from common.palette import GOLD_LIGHT, STONE_AXIS, IVORY_WHITE
-from common.latex import mach_math_template
 
 
 def play_scene02(scene):
@@ -39,3 +40,6 @@ def play_scene02(scene):
 
     # تفريغ المشهد
     scene.play(FadeOut(VGroup(title, line_group, ops_group)), run_time=0.6)
+
+    # إيقاف تأثير النيون على الشاشة
+    turn_off_neon(scene, run_time=0.6)
