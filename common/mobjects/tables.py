@@ -2,6 +2,7 @@ from manim import *
 
 from common.palette import (
     GOLD_LIGHT,
+    GOLD_DARK,      # تم اختياره ليكون اللون الذهبي الداخلي الرزين
     STONE_DASH,
 )
 
@@ -105,9 +106,11 @@ class MachTable(VGroup):
         glass_color=GOLD_LIGHT,
         glass_opacity=0.035,
         glass_border_opacity=0.12,
-        separator_color=STONE_DASH,
-        separator_width=1.0,
-        separator_opacity=0.28,
+        separator_color=GOLD_DARK,    # <--- اللون الذهبي المعتمد للخطوط الداخلية
+        separator_width=0.9,          # تم تنعيم السماكة لتناسب الشرطات
+        separator_opacity=0.38,       # شفافية ذهبية هادئة وراقية
+        dash_length=0.075,            # طول الشرطة الواحدة بالمليمتر
+        dashed_ratio=0.55,            # نسبة طول الشرطة إلى الفراغ بينها
         shimmer=True,
         shimmer_speed=12.0,
         shimmer_radius=0.010,
@@ -144,14 +147,12 @@ class MachTable(VGroup):
 
         if len(row_heights) != rows:
             raise ValueError(
-                "row_heights must contain exactly "
-                f"{rows} values."
+                f"row_heights must contain exactly {rows} values."
             )
 
         if len(col_widths) != cols:
             raise ValueError(
-                "col_widths must contain exactly "
-                f"{cols} values."
+                f"col_widths must contain exactly {cols} values."
             )
 
         if not np.isclose(sum(row_heights), height):
@@ -249,7 +250,7 @@ class MachTable(VGroup):
             self.cells.append(row_cells)
 
         # ======================================================
-        # Separators
+        # Separators (خطوط متقطعة ذهبية ناعمة Dashed Lines)
         # ======================================================
 
         self.separators = VGroup()
@@ -257,7 +258,7 @@ class MachTable(VGroup):
         self.horizontal_separators = VGroup()
 
         # ------------------------------------------------------
-        # Vertical separators
+        # Vertical separators (الفواصل الرأسية المتقطعة)
         # ------------------------------------------------------
 
         x = -width / 2
@@ -266,9 +267,11 @@ class MachTable(VGroup):
 
             x += col_widths[col]
 
-            separator = Line(
+            separator = DashedLine(
                 UP * (height / 2 - 0.12),
                 DOWN * (height / 2 - 0.12),
+                dash_length=dash_length,
+                dashed_ratio=dashed_ratio,
                 color=separator_color,
                 stroke_width=separator_width,
                 stroke_opacity=separator_opacity,
@@ -287,7 +290,7 @@ class MachTable(VGroup):
             )
 
         # ------------------------------------------------------
-        # Horizontal separators
+        # Horizontal separators (الفواصل الأفقية المتقطعة)
         # ------------------------------------------------------
 
         y = height / 2
@@ -296,9 +299,11 @@ class MachTable(VGroup):
 
             y -= row_heights[row]
 
-            separator = Line(
+            separator = DashedLine(
                 LEFT * (width / 2 - 0.12),
                 RIGHT * (width / 2 - 0.12),
+                dash_length=dash_length,
+                dashed_ratio=dashed_ratio,
                 color=separator_color,
                 stroke_width=separator_width,
                 stroke_opacity=separator_opacity,
@@ -324,20 +329,9 @@ class MachTable(VGroup):
 
         self.light_group = VGroup()
 
-        # ------------------------------------------------------
-        # IMPORTANT:
-        #
-        # The shimmer follows the actual RoundedRectangle
-        # VMobject path used by the visible table border.
-        # ------------------------------------------------------
-
         self._shimmer_path = self.table
 
         if shimmer:
-
-            # --------------------------------------------------
-            # Soft glow
-            # --------------------------------------------------
 
             self.light_glow = Circle(
                 radius=0.045,
@@ -346,34 +340,18 @@ class MachTable(VGroup):
                 fill_opacity=0.10,
             )
 
-            # --------------------------------------------------
-            # Bright core
-            # --------------------------------------------------
-
             self.light_dot = Dot(
                 radius=self.shimmer_radius,
                 color=GOLD_LIGHT,
             )
-
-            # --------------------------------------------------
-            # Group
-            # --------------------------------------------------
 
             self.light_group.add(
                 self.light_glow,
                 self.light_dot,
             )
 
-            # --------------------------------------------------
-            # Z-index
-            # --------------------------------------------------
-
             self.light_glow.set_z_index(100)
             self.light_dot.set_z_index(110)
-
-            # --------------------------------------------------
-            # Initial state
-            # --------------------------------------------------
 
             self.light_progress.set_value(0)
 
@@ -382,10 +360,6 @@ class MachTable(VGroup):
             )
 
             self.light_group.set_opacity(0)
-
-            # --------------------------------------------------
-            # Permanent updater
-            # --------------------------------------------------
 
             def update_light(mob, dt):
 
@@ -451,10 +425,6 @@ class MachTable(VGroup):
     ):
         animations = []
 
-        # ------------------------------------------------------
-        # Reset shimmer
-        # ------------------------------------------------------
-
         if self.shimmer_enabled:
 
             self._shimmer_running = False
@@ -467,10 +437,6 @@ class MachTable(VGroup):
 
             self.light_group.set_opacity(0)
 
-        # ------------------------------------------------------
-        # Outer frame
-        # ------------------------------------------------------
-
         animations.append(
             Create(
                 self.table,
@@ -478,33 +444,12 @@ class MachTable(VGroup):
             )
         )
 
-        # ------------------------------------------------------
-        # Glass
-        # ------------------------------------------------------
-
         animations.append(
             FadeIn(
                 self.glass,
                 run_time=run_time * 0.12,
             )
         )
-
-        # ------------------------------------------------------
-        # Center point
-        #
-        # Intentionally disabled.
-        #
-        # The center construction point used to create a faint
-        # glow in the middle of the table during construction.
-        # It is no longer rendered.
-        #
-        # `center_point` is kept in the method signature for
-        # backward compatibility with existing scenes.
-        # ------------------------------------------------------
-
-        # ------------------------------------------------------
-        # Vertical separators
-        # ------------------------------------------------------
 
         for separator in self.vertical_separators:
 
@@ -515,10 +460,6 @@ class MachTable(VGroup):
                     rate_func=rate_func,
                 )
             )
-
-        # ------------------------------------------------------
-        # Horizontal separators
-        # ------------------------------------------------------
 
         if len(self.horizontal_separators) > 0:
 
@@ -540,17 +481,9 @@ class MachTable(VGroup):
 
         self._construction_ready = True
 
-        # ------------------------------------------------------
-        # Main construction animation
-        # ------------------------------------------------------
-
         construction = Succession(
             *animations
         )
-
-        # ------------------------------------------------------
-        # Shimmer activation
-        # ------------------------------------------------------
 
         if (
             show_shimmer
