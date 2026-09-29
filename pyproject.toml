@@ -1,9 +1,17 @@
 [project]
 name = "linear-algebra-course"
 version = "0.1.0"
-description = "Add your description here"
+description = "Source code for Mach-Math Linear Algebra visual course"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "manim>=0.21.0",
+    "arabic-reshaper>=3.0.1",
+    "python-bidi>=0.6.1",
 ]
+
+[tool.uv]
+package = true
+
+[tool.setuptools]
+packages = ["common"]
