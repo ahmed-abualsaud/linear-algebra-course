@@ -1,8 +1,11 @@
 """الـ"هوية البصرية" المشتركة لقناة MACH-MATH.
 
 نسخة نهائية شاملة ومضبوطة سينمائياً وزمنياً:
+- النقطة الضوئية: تشتت سطحي فائق النعومة بـ 60 طبقة متدرجة بالمليمتر (60-Layer Optical Flare).
+- متوافق 100% مع Manim v0.21.0 وبايثون 3.13.
 - الإنترو: 7.0 ثوانٍ بالمليمتر.
 - الأوترو: 5.0 ثوانٍ متناسقة مع جملة الختام.
+- فريم موحد بتطابق تام في درجة ظهور الخطوط الداخلية والقطرية (0.18).
 - فريم نيون ذهبي بتشتت سطحي هادئ وفخم.
 - دوال turn_on_neon و turn_off_neon للتحكم في الإضاءة.
 """
@@ -25,6 +28,115 @@ OFF_SCREEN_TOP = UP * 4.5
 FRAME_HALF_W, FRAME_HALF_H = 3.0, 1.7
 
 
+def _get_luminous_point(location=ORIGIN):
+    """بناء نقطة ضوئية سينمائية فائقة النعومة والتشتت بـ 60 طبقة متدرجة صريحة
+
+    (60-Layer Optical Flare).
+
+    تلاشٍ مستمر يذوب في السواد بدون أي حلقات أو حواف حادة، ومتوافق 100% مع أحدث
+    إصدار مانيم.
+    """
+    glow_group = VGroup()
+
+    # 60 طبقة ضبابية متدرجة بدقة فائقة من الأوسع والأخفت إلى الأقرب والأنصع
+    halo_layers = [
+        # ======================================================
+        # 1. التشتت الجوي الأبعد (ATMOSPHERIC SCATTERING - 15 طبقة)
+        # ======================================================
+        {"radius": 1.40, "color": GOLD_MUTED, "opacity": 0.0010},
+        {"radius": 1.35, "color": GOLD_MUTED, "opacity": 0.0014},
+        {"radius": 1.30, "color": GOLD_MUTED, "opacity": 0.0019},
+        {"radius": 1.25, "color": GOLD_MUTED, "opacity": 0.0025},
+        {"radius": 1.20, "color": GOLD_MUTED, "opacity": 0.0032},
+        {"radius": 1.15, "color": GOLD_MUTED, "opacity": 0.0040},
+        {"radius": 1.10, "color": GOLD_MUTED, "opacity": 0.0049},
+        {"radius": 1.05, "color": GOLD_MUTED, "opacity": 0.0059},
+        {"radius": 1.00, "color": GOLD_MUTED, "opacity": 0.0070},
+        {"radius": 0.95, "color": GOLD_MUTED, "opacity": 0.0082},
+        {"radius": 0.90, "color": GOLD_MUTED, "opacity": 0.0096},
+        {"radius": 0.86, "color": GOLD_MUTED, "opacity": 0.0112},
+        {"radius": 0.82, "color": GOLD_MUTED, "opacity": 0.0130},
+        {"radius": 0.78, "color": GOLD_MUTED, "opacity": 0.0150},
+        {"radius": 0.75, "color": GOLD_MUTED, "opacity": 0.0172},
+        # ======================================================
+        # 2. الهالة الدافئة العميقة (MID WARM GLOW - 10 طبقات)
+        # ======================================================
+        {"radius": 0.72, "color": GOLD_DARK, "opacity": 0.0198},
+        {"radius": 0.69, "color": GOLD_DARK, "opacity": 0.0226},
+        {"radius": 0.66, "color": GOLD_DARK, "opacity": 0.0258},
+        {"radius": 0.63, "color": GOLD_DARK, "opacity": 0.0294},
+        {"radius": 0.60, "color": GOLD_DARK, "opacity": 0.0334},
+        {"radius": 0.57, "color": GOLD_DARK, "opacity": 0.0378},
+        {"radius": 0.54, "color": GOLD_DARK, "opacity": 0.0428},
+        {"radius": 0.51, "color": GOLD_DARK, "opacity": 0.0484},
+        {"radius": 0.48, "color": GOLD_DARK, "opacity": 0.0546},
+        {"radius": 0.45, "color": GOLD_DARK, "opacity": 0.0615},
+        # ======================================================
+        # 3. الهالة الذهبية المتوهجة (GOLDEN RADIANCE - 8 طبقات)
+        # ======================================================
+        {"radius": 0.43, "color": GOLD, "opacity": 0.0680},
+        {"radius": 0.41, "color": GOLD, "opacity": 0.0760},
+        {"radius": 0.39, "color": GOLD, "opacity": 0.0850},
+        {"radius": 0.37, "color": GOLD, "opacity": 0.0950},
+        {"radius": 0.35, "color": GOLD, "opacity": 0.1060},
+        {"radius": 0.33, "color": GOLD, "opacity": 0.1180},
+        {"radius": 0.31, "color": GOLD, "opacity": 0.1310},
+        {"radius": 0.29, "color": GOLD, "opacity": 0.1450},
+        # ======================================================
+        # 4. الهالة المنيرة القريبة (INNER BRIGHT CORONA - 12 طبقة)
+        # ======================================================
+        {"radius": 0.275, "color": GOLD_LIGHT, "opacity": 0.1600},
+        {"radius": 0.260, "color": GOLD_LIGHT, "opacity": 0.1770},
+        {"radius": 0.245, "color": GOLD_LIGHT, "opacity": 0.1950},
+        {"radius": 0.230, "color": GOLD_LIGHT, "opacity": 0.2150},
+        {"radius": 0.215, "color": GOLD_LIGHT, "opacity": 0.2370},
+        {"radius": 0.200, "color": GOLD_LIGHT, "opacity": 0.2610},
+        {"radius": 0.185, "color": GOLD_LIGHT, "opacity": 0.2870},
+        {"radius": 0.170, "color": GOLD_LIGHT, "opacity": 0.3150},
+        {"radius": 0.158, "color": GOLD_LIGHT, "opacity": 0.3450},
+        {"radius": 0.146, "color": GOLD_LIGHT, "opacity": 0.3780},
+        {"radius": 0.135, "color": GOLD_LIGHT, "opacity": 0.4130},
+        {"radius": 0.125, "color": GOLD_LIGHT, "opacity": 0.4500},
+        # ======================================================
+        # 5. التوهج الشديد حول المركز (HOT SURROUND - 9 طبقات)
+        # ======================================================
+        {"radius": 0.115, "color": GOLD_BRIGHT, "opacity": 0.4900},
+        {"radius": 0.105, "color": GOLD_BRIGHT, "opacity": 0.5350},
+        {"radius": 0.096, "color": GOLD_BRIGHT, "opacity": 0.5850},
+        {"radius": 0.088, "color": GOLD_BRIGHT, "opacity": 0.6400},
+        {"radius": 0.080, "color": GOLD_BRIGHT, "opacity": 0.7000},
+        {"radius": 0.073, "color": GOLD_BRIGHT, "opacity": 0.7600},
+        {"radius": 0.066, "color": GOLD_BRIGHT, "opacity": 0.8200},
+        {"radius": 0.060, "color": GOLD_BRIGHT, "opacity": 0.8750},
+        {"radius": 0.054, "color": GOLD_BRIGHT, "opacity": 0.9200},
+        # ======================================================
+        # 6. البؤرة الحارقة النقية (WHITE HOT EMISSION - 6 طبقات)
+        # ======================================================
+        {"radius": 0.048, "color": "#FFFFFF", "opacity": 0.9400},
+        {"radius": 0.043, "color": "#FFFFFF", "opacity": 0.9550},
+        {"radius": 0.038, "color": "#FFFFFF", "opacity": 0.9700},
+        {"radius": 0.033, "color": "#FFFFFF", "opacity": 0.9800},
+        {"radius": 0.028, "color": "#FFFFFF", "opacity": 0.9900},
+        {"radius": 0.024, "color": "#FFFFFF", "opacity": 0.9950},
+    ]
+
+    for layer in halo_layers:
+        glow_group.add(
+            Circle(
+                radius=layer["radius"],
+                stroke_width=0,
+                fill_color=layer["color"],
+                fill_opacity=layer["opacity"],
+            ).move_to(location)
+        )
+
+    # النواة المركزية البيضاء الساطعة (Hot Point Core)
+    core = Dot(location, radius=0.020, color="#FFFFFF")
+    glow_group.add(core)
+
+    return glow_group
+
+
 def _get_falloff_radial_line(p_start, p_end, n_segments=50):
     """خطوط شعاعية ناعمة جداً بتلاشٍ خافت مستمر يخدم إضاءة النيون بهدوء."""
     segments_group = VGroup()
@@ -44,7 +156,6 @@ def _get_falloff_radial_line(p_start, p_end, n_segments=50):
 
         pt_a, pt_b = points[i], points[i + 1]
 
-        # طبقة الهالة الرقيقة
         bloom_w = interpolate(10.0, 1.0, t) * falloff
         bloom_op = interpolate(0.10, 0.008, t) * falloff
         if bloom_op > 0.001:
@@ -59,7 +170,6 @@ def _get_falloff_radial_line(p_start, p_end, n_segments=50):
                 )
             )
 
-        # سلك القلب الناعم
         core_w = interpolate(1.0, 0.35, t) * (falloff**0.4)
         core_op = interpolate(0.70, 0.08, t) * (falloff**0.3)
         if core_op > 0.003:
@@ -80,7 +190,7 @@ def _get_falloff_radial_line(p_start, p_end, n_segments=50):
 def get_mach_frame(neon=False):
     """بناء الفريم الموحد:
 
-    - neon=False : الفريم الهادئ الرقيق (معاير لعدم التشويش على المحتوى).
+    - neon=False : فريم هادئ متطابق في كل خطوطه الداخلية والقطرية.
     - neon=True  : نيون ذهبي بانتشار سطحي فخم ومحسوب.
     """
     inner = [
@@ -110,14 +220,15 @@ def get_mach_frame(neon=False):
                 for i in range(4)
             ]
         )
+
         radial_lines = VGroup(
             *[
                 Line(
                     inner[i],
                     outer[i],
                     color=GOLD_MUTED,
-                    stroke_width=0.5,
-                    stroke_opacity=0.08,
+                    stroke_width=0.6,
+                    stroke_opacity=0.18,
                 )
                 for i in range(4)
             ]
@@ -274,19 +385,10 @@ def turn_off_neon(scene, run_time=0.8):
 class IntroScene(Scene):
 
     def construct(self):
-        core = Dot(OFF_SCREEN_TOP, radius=0.06, color=GOLD_BRIGHT)
-        glow_mid = Circle(
-            radius=0.15,
-            stroke_width=0,
-            fill_color=GOLD_LIGHT,
-            fill_opacity=0.35,
-        ).move_to(OFF_SCREEN_TOP)
-        glow_outer = Circle(
-            radius=0.30, stroke_width=0, fill_color=GOLD, fill_opacity=0.15
-        ).move_to(OFF_SCREEN_TOP)
-        point = VGroup(glow_outer, glow_mid, core)
+        # بناء النقطة الضوئية فائقة النعومة بـ 60 طبقة
+        point = _get_luminous_point(OFF_SCREEN_TOP)
 
-        # 1. نزول النقطة الذهبية (0.9s)
+        # 1. نزول النقطة الذهبية المتوهجة بنعومة (0.9s)
         self.play(
             point.animate.move_to(ORIGIN),
             run_time=0.9,
@@ -313,7 +415,7 @@ class IntroScene(Scene):
         )
         mach_word.set_color_by_gradient(GOLD_BRIGHT, GOLD_LIGHT, GOLD_DARK)
 
-        # 3. ظهور كلمة MACH وتلاشي النقطة (0.6s)
+        # 3. ظهور كلمة MACH وتلاشي النقطة الضوئية (0.6s)
         self.play(
             FadeIn(mach_word, scale=0.1),
             FadeOut(point, scale=0.1),
@@ -375,7 +477,6 @@ class IntroScene(Scene):
 
         # 9. تلاشي الشعار للانتقال للمشهد الأول (0.7s)
         self.play(FadeOut(complete_logo, scale=1.2), run_time=0.7)
-        # إجمالي زمن الإنترو: 0.9 + 0.8 + 0.6 + 0.5 + 0.8 + 0.5 + 1.0 + 1.2 + 0.7 = 7.0 ثوانٍ بالمليمتر!
 
 
 # ==============================================================
@@ -395,21 +496,12 @@ class MachMathScene(Scene):
 class OutroScene(Scene):
 
     def construct(self):
-        core = Dot(ORIGIN, radius=0.06, color=GOLD_BRIGHT)
-        glow_mid = Circle(
-            radius=0.15,
-            stroke_width=0,
-            fill_color=GOLD_LIGHT,
-            fill_opacity=0.35,
-        ).move_to(ORIGIN)
-        glow_outer = Circle(
-            radius=0.30, stroke_width=0, fill_color=GOLD, fill_opacity=0.15
-        ).move_to(ORIGIN)
-        point = VGroup(glow_outer, glow_mid, core)
+        # بناء النقطة الضوئية فائقة النعومة بـ 60 طبقة في المركز
+        point = _get_luminous_point(ORIGIN)
 
         existing_mobjects = Group(*self.mobjects)
 
-        # 1. ظهور النقطة الذهبية في المركز كبؤرة جذب (0.6s)
+        # 1. ظهور النقطة الضوئية المتوهجة في المركز كبؤرة جذب (0.6s)
         self.play(FadeIn(point, scale=0.2), run_time=0.6)
 
         # 2. ابتلاع كافة محتويات الشاشة إلى داخل النقطة (1.4s)
@@ -424,7 +516,7 @@ class OutroScene(Scene):
         # 3. وقفة صامتة تتناغم مع جملة: "سلام عليكم" (0.8s)
         self.wait(0.8)
 
-        # 4. انطلاق النقطة للأعلى واختفائها في الفضاء (1.4s)
+        # 4. انطلاق النقطة الضوئية للأعلى واختفائها في الفضاء (1.4s)
         self.play(
             point.animate.move_to(OFF_SCREEN_TOP),
             run_time=1.4,
@@ -433,4 +525,3 @@ class OutroScene(Scene):
 
         # 5. استقرار أخير للشاشة السوداء (0.8s)
         self.wait(0.8)
-        # إجمالي زمن الأوترو: 0.6 + 1.4 + 0.8 + 1.4 + 0.8 = 5.0 ثوانٍ بالضبط!
