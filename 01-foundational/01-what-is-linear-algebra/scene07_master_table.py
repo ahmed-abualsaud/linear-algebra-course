@@ -23,7 +23,6 @@ def play_scene07(scene):
         cols=3,
         width=10.4,
         height=4.8,
-        # LEFT = rules, CENTER = subject, RIGHT = science
         col_widths=[4.1, 3.2, 3.1],
         cell_padding=0.12,
         border_color=GOLD_LIGHT,
@@ -34,12 +33,12 @@ def play_scene07(scene):
         glass_color=GOLD_LIGHT,
         glass_opacity=0.035,
         glass_border_opacity=0.12,
-        separator_color=GOLD_DARK,  # خطوط متقطعة ذهبية فخمة
+        separator_color=GOLD_DARK,
         separator_width=0.9,
         separator_opacity=0.38,
         shimmer=True,
-        shimmer_speed=12.0,
-        shimmer_radius=0.010,
+        shimmer_speed=50.0,
+        shimmer_radius=0.011,
     )
 
     # ==============================================================
