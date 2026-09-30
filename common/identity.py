@@ -1,10 +1,10 @@
 """الـ"هوية البصرية" المشتركة لقناة MACH-MATH.
 
-نسخة نهائية شاملة ومضبوطة سينمائياً:
-- خطوط فراغية خافتة ناعمة جداً تمنع أي تشويش على الجداول والإحداثيات.
-- فريم نيون ذهبي بتشتت سطحي حقيقي يفرش في الفضاء (Planar Volumetric Glow).
-- دوال turn_on_neon و turn_off_neon متوافقة وانسيابية.
-- أوترو منضبط يمحو الشاشة بالكامل دون أي تكرار.
+نسخة نهائية شاملة ومضبوطة سينمائياً وزمنياً:
+- الإنترو: 7.0 ثوانٍ بالمليمتر.
+- الأوترو: 5.0 ثوانٍ متناسقة مع جملة الختام.
+- فريم نيون ذهبي بتشتت سطحي هادئ وفخم.
+- دوال turn_on_neon و turn_off_neon للتحكم في الإضاءة.
 """
 
 from manim import *
@@ -44,7 +44,7 @@ def _get_falloff_radial_line(p_start, p_end, n_segments=50):
 
         pt_a, pt_b = points[i], points[i + 1]
 
-        # طبقة الهالة الرقيقة (تم تهدئتها لعدم التشويش)
+        # طبقة الهالة الرقيقة
         bloom_w = interpolate(10.0, 1.0, t) * falloff
         bloom_op = interpolate(0.10, 0.008, t) * falloff
         if bloom_op > 0.001:
@@ -98,7 +98,6 @@ def get_mach_frame(neon=False):
     ]
 
     if not neon:
-        # 1. إطار المستطيل الداخلي الهادئ
         inner_edges = VGroup(
             *[
                 Line(
@@ -111,8 +110,6 @@ def get_mach_frame(neon=False):
                 for i in range(4)
             ]
         )
-
-        # 2. خطوط زوايا الغرفة الخلفية (خافتة جداً ورقيقة لتعطي عمقاً دون تشويش)
         radial_lines = VGroup(
             *[
                 Line(
@@ -127,9 +124,6 @@ def get_mach_frame(neon=False):
         )
         return VGroup(inner_edges, radial_lines)
     else:
-        # ==============================================================
-        # 2. فريم النيون السطحي فائق النعومة والانتشارية (Planar Glow)
-        # ==============================================================
         wall_top = Polygon(
             inner[0],
             outer[0],
@@ -275,7 +269,7 @@ def turn_off_neon(scene, run_time=0.8):
 
 
 # ==============================================================
-# 1. INTRO SCENE (شعار متوازن بالمليمتر بخط Cairo العريض)
+# 1. INTRO SCENE (المدة المحسوبة بالضبط: 7.0 ثوانٍ)
 # ==============================================================
 class IntroScene(Scene):
 
@@ -292,25 +286,22 @@ class IntroScene(Scene):
         ).move_to(OFF_SCREEN_TOP)
         point = VGroup(glow_outer, glow_mid, core)
 
+        # 1. نزول النقطة الذهبية (0.9s)
         self.play(
             point.animate.move_to(ORIGIN),
-            run_time=1.0,
-            rate_func=rate_functions.ease_out_cubic,
-        )
-
-        # حفظ الفريم مباشرة في self.frame لمنع تكراره
-        self.frame = get_mach_frame(neon=False)
-        self.play(
-            GrowFromPoint(self.frame, ORIGIN),
             run_time=0.9,
             rate_func=rate_functions.ease_out_cubic,
         )
 
-        font_kwargs = {
-            "font": "Serif",
-            "weight": BOLD,
-            "font_size": 46
-        }
+        # 2. تفرع الفريم الهادئ من النقطة (0.8s)
+        self.frame = get_mach_frame(neon=False)
+        self.play(
+            GrowFromPoint(self.frame, ORIGIN),
+            run_time=0.8,
+            rate_func=rate_functions.ease_out_cubic,
+        )
+
+        font_kwargs = {"font": "Serif", "weight": BOLD, "font_size": 46}
 
         ma_part = Text("MA", **font_kwargs)
         c_letter = Text("C", **font_kwargs)
@@ -322,24 +313,31 @@ class IntroScene(Scene):
         )
         mach_word.set_color_by_gradient(GOLD_BRIGHT, GOLD_LIGHT, GOLD_DARK)
 
+        # 3. ظهور كلمة MACH وتلاشي النقطة (0.6s)
         self.play(
-            FadeIn(mach_word, scale=0.1), FadeOut(point, scale=0.1), run_time=0.7
+            FadeIn(mach_word, scale=0.1),
+            FadeOut(point, scale=0.1),
+            run_time=0.6,
         )
-        self.wait(0.7)
+        # 4. وقفة خفيفة للمشاهد (0.5s)
+        self.wait(0.5)
 
         t_letter = Text("T", **font_kwargs).move_to(c_letter.get_center())
         t_letter.set_color_by_gradient(GOLD_BRIGHT, GOLD_LIGHT)
         t_letter.shift(UP * 0.6).set_opacity(0)
 
+        # 5. تحول C إلى T لتكوين MATH (0.8s)
         self.play(
             c_letter.animate.shift(DOWN * 0.6).set_opacity(0),
             t_letter.animate.shift(DOWN * 0.6).set_opacity(1),
-            run_time=0.85,
+            run_time=0.8,
             rate_func=rate_functions.ease_in_out_cubic,
         )
         self.remove(c_letter)
         math_word = VGroup(ma_part, t_letter, h_letter)
-        self.wait(0.6)
+
+        # 6. وقفة إدراك للمشاهد (0.5s)
+        self.wait(0.5)
 
         left_mach = Text("MACH", **font_kwargs).set_color_by_gradient(
             GOLD_BRIGHT, GOLD_LIGHT, GOLD_DARK
@@ -361,17 +359,23 @@ class IntroScene(Scene):
         dash_char.move_to(target_dash_pos)
         left_mach.move_to(target_mach_pos)
 
+        # 7. اكتمال الشعار MACH-MATH (1.0s)
         self.play(
             math_word.animate.move_to(target_math_pos),
             FadeIn(left_mach, shift=RIGHT * 0.5),
             FadeIn(dash_char, scale=0.5),
-            run_time=1.1,
+            run_time=1.0,
             rate_func=rate_functions.ease_in_out_sine,
         )
 
         complete_logo = VGroup(left_mach, dash_char, math_word)
-        self.wait(1.0)
-        self.play(FadeOut(complete_logo, scale=1.2), run_time=0.6)
+
+        # 8. استعراض الشعار بكامل فخامته (1.2s)
+        self.wait(1.2)
+
+        # 9. تلاشي الشعار للانتقال للمشهد الأول (0.7s)
+        self.play(FadeOut(complete_logo, scale=1.2), run_time=0.7)
+        # إجمالي زمن الإنترو: 0.9 + 0.8 + 0.6 + 0.5 + 0.8 + 0.5 + 1.0 + 1.2 + 0.7 = 7.0 ثوانٍ بالمليمتر!
 
 
 # ==============================================================
@@ -386,7 +390,7 @@ class MachMathScene(Scene):
 
 
 # ==============================================================
-# 3. OUTRO SCENE
+# 3. OUTRO SCENE (المدة المحسوبة بالضبط: 5.0 ثوانٍ)
 # ==============================================================
 class OutroScene(Scene):
 
@@ -405,20 +409,28 @@ class OutroScene(Scene):
 
         existing_mobjects = Group(*self.mobjects)
 
-        self.play(FadeIn(point, scale=0.2), run_time=0.5)
+        # 1. ظهور النقطة الذهبية في المركز كبؤرة جذب (0.6s)
+        self.play(FadeIn(point, scale=0.2), run_time=0.6)
 
+        # 2. ابتلاع كافة محتويات الشاشة إلى داخل النقطة (1.4s)
         self.play(
             FadeOut(existing_mobjects, scale=0.01, target_position=ORIGIN),
-            run_time=1.2,
+            run_time=1.4,
             rate_func=rate_functions.ease_in_out_sine,
         )
         self.clear()
         self.add(point)
-        self.wait(0.2)
 
+        # 3. وقفة صامتة تتناغم مع جملة: "سلام عليكم" (0.8s)
+        self.wait(0.8)
+
+        # 4. انطلاق النقطة للأعلى واختفائها في الفضاء (1.4s)
         self.play(
             point.animate.move_to(OFF_SCREEN_TOP),
-            run_time=1.3,
+            run_time=1.4,
             rate_func=rate_functions.ease_in_quad,
         )
-        self.wait(0.4)
+
+        # 5. استقرار أخير للشاشة السوداء (0.8s)
+        self.wait(0.8)
+        # إجمالي زمن الأوترو: 0.6 + 1.4 + 0.8 + 1.4 + 0.8 = 5.0 ثوانٍ بالضبط!
