@@ -37,7 +37,7 @@ def play_scene07(scene):
         separator_width=0.9,
         separator_opacity=0.38,
         shimmer=True,
-        shimmer_speed=50.0,
+        shimmer_speed=65.0,
         shimmer_radius=0.011,
     )
 

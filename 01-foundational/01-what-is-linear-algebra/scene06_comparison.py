@@ -25,7 +25,7 @@ def play_scene06(scene):
         height=5.8,
         cell_padding=0.12,
         shimmer=True,
-        shimmer_speed=50.0,
+        shimmer_speed=65.0,
         shimmer_radius=0.011,
     )
 
