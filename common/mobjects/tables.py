@@ -100,8 +100,8 @@ class MachTable(VGroup):
         dash_length=0.075,
         dashed_ratio=0.55,
         shimmer=True,
-        # سرعة هادئة جداً (50 ثانية للدورة)
-        shimmer_speed=50.0,
+        # سرعة هادئة جداً (65 ثانية للدورة)
+        shimmer_speed=65.0,
         shimmer_radius=0.012,
         # الانعكاس الأرضي ثلاثي الأبعاد
         floor_reflection=True,
