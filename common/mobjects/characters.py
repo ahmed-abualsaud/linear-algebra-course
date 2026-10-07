@@ -33,7 +33,7 @@ MACH-MATH Avatar v2
 from manim import *
 import numpy as np
 
-from common.palette import GOLD_LIGHT, GOLD_BRIGHT, STONE_AXIS
+from common.palette import COPPER_TERRA, GOLD_LIGHT, GOLD_BRIGHT, STONE_AXIS
 
 
 # ---------------------------------------------------------------
@@ -1077,3 +1077,148 @@ def mach_stick_figure(
         size=scale,
         **kwargs,
     )
+
+# ---------------------------------------------------------------
+# Mathematician Avatar (عالم الرياضيات)
+# ---------------------------------------------------------------
+
+def mach_mathematician(
+    color=COPPER_TERRA,
+    accent_color=GOLD_LIGHT,
+    pose="thinking",
+    scale=1.0,
+    glasses=True,
+    tie_type="bowtie",  # الخيارات: "bowtie" (فيونكة بروفيسور) أو "tie" (كرافتة هندسية) أو None
+    **kwargs,
+):
+    """
+    شخصية عالم الرياضيات لقناة MACH-MATH:
+    - مجهزة بنظارة دائرية أكاديمية أنيقة متطابقة 100% مع مراكز العينين.
+    - مزودة بفيونكة أكاديمية (Bow Tie) هندسية مذهبة عند الرقبة.
+    - لون مائل للبرونز/النحاسي الدافئ لتمييزه عن الشخصية العادية.
+    """
+    avatar = MachAvatar(
+        color=color,
+        accent_color=accent_color,
+        pose=pose,
+        size=scale,
+        **kwargs,
+    )
+
+    # 1. النظارة الأكاديمية
+    if glasses:
+        center_l = avatar.eyes[0].get_center()
+        center_r = avatar.eyes[1].get_center()
+
+        r_lens = 0.082
+
+        glass_l = Circle(
+            radius=r_lens,
+            stroke_width=1.7,
+            color=accent_color,
+            stroke_opacity=0.95,
+            fill_color=DARK,
+            fill_opacity=0.25,
+        ).move_to(center_l)
+
+        glass_r = Circle(
+            radius=r_lens,
+            stroke_width=1.7,
+            color=accent_color,
+            stroke_opacity=0.95,
+            fill_color=DARK,
+            fill_opacity=0.25,
+        ).move_to(center_r)
+
+        unit_vec = (center_r - center_l) / np.linalg.norm(center_r - center_l)
+
+        bridge = Line(
+            center_l + unit_vec * r_lens,
+            center_r - unit_vec * r_lens,
+            stroke_width=1.6,
+            color=accent_color,
+            stroke_opacity=0.9,
+        )
+
+        temple_l = Line(
+            center_l - unit_vec * r_lens,
+            center_l - unit_vec * (r_lens + 0.14),
+            stroke_width=1.6,
+            color=accent_color,
+            stroke_opacity=0.75,
+        )
+
+        temple_r = Line(
+            center_r + unit_vec * r_lens,
+            center_r + unit_vec * (r_lens + 0.14),
+            stroke_width=1.6,
+            color=accent_color,
+            stroke_opacity=0.75,
+        )
+
+        glasses_group = VGroup(glass_l, glass_r, bridge, temple_l, temple_r)
+        avatar.head.add(glasses_group)
+
+    # 2. الكرافتة / الفيونكة الهندسية عند الرقبة
+    if tie_type:
+        # موضع اتصال الرقبة بالصدر
+        neck_bottom = avatar[1].get_end()  # نهاية خط الرقبة
+
+        if tie_type == "bowtie":
+            # فيونكة أكاديمية كلاسيكية: عقدة وسطى ومثلثان جانبيان
+            knot = Dot(
+                point=neck_bottom + DOWN * 0.04,
+                radius=0.032,
+                color=accent_color,
+            )
+            # الجناح الأيسر للفيونكة
+            wing_l = Polygon(
+                knot.get_center(),
+                knot.get_center() + LEFT * 0.14 + UP * 0.065,
+                knot.get_center() + LEFT * 0.14 + DOWN * 0.065,
+                color=color,
+                stroke_width=1.4,
+                fill_color=DARK,
+                fill_opacity=1.0,
+            )
+            # الجناح الأيمن للفيونكة
+            wing_r = Polygon(
+                knot.get_center(),
+                knot.get_center() + RIGHT * 0.14 + UP * 0.065,
+                knot.get_center() + RIGHT * 0.14 + DOWN * 0.065,
+                color=color,
+                stroke_width=1.4,
+                fill_color=DARK,
+                fill_opacity=1.0,
+            )
+            tie_group = VGroup(wing_l, wing_r, knot)
+
+        elif tie_type == "tie":
+            # كرافتة هندسية طويلة ورفيعة
+            knot = Polygon(
+                neck_bottom + LEFT * 0.06 + DOWN * 0.01,
+                neck_bottom + RIGHT * 0.06 + DOWN * 0.01,
+                neck_bottom + RIGHT * 0.04 + DOWN * 0.08,
+                neck_bottom + LEFT * 0.04 + DOWN * 0.08,
+                color=accent_color,
+                stroke_width=1.2,
+                fill_color=accent_color,
+                fill_opacity=0.85,
+            )
+            tie_body = Polygon(
+                neck_bottom + LEFT * 0.04 + DOWN * 0.08,
+                neck_bottom + RIGHT * 0.04 + DOWN * 0.08,
+                neck_bottom + RIGHT * 0.065 + DOWN * 0.32,
+                neck_bottom + DOWN * 0.38,
+                neck_bottom + LEFT * 0.065 + DOWN * 0.32,
+                color=color,
+                stroke_width=1.5,
+                fill_color=DARK,
+                fill_opacity=1.0,
+            )
+            tie_group = VGroup(tie_body, knot)
+
+        # إضافة الكرافتة إلى الجذع لتتحرك وتتنفس معه رأسياً
+        avatar.add(tie_group)
+
+    return avatar

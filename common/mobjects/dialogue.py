@@ -70,18 +70,41 @@ def thought_bubble(
     text,
     anchor_head,
     color=WHITE,
-    text_color=None,
-    font_size=55,
-    buff=0.35,              # <--- تم تعديل المسافة الافتراضية
+    text_color=WHITE,
+    font_size=35,
+    font="Cairo",
+    buff=0.45,            # زيادة طفيفة للمسافة لتعطي مساحة للدوائر
     extra_shift=ORIGIN,
     tex_template=None,
     bg_color="#24201A",
     bg_opacity=0.75,
+    use_math=False,
 ):
     """
-    بالونة تفكير موحدة لمعادلات ورموز التفكير بمسافات دوائر منضبطة.
+    بالونة تفكير موحدة.
+    ترجع:
+        box, dots, mark, draw_start, draw_end
     """
-    mark = MathTex(text, tex_template=tex_template, font_size=font_size, color=text_color or color)
+
+    if isinstance(text, Mobject):
+        mark = text
+    elif use_math:
+        mark = MathTex(
+            text,
+            tex_template=tex_template,
+            font_size=font_size,
+            color=text_color or color,
+        )
+    else:
+        mark = Text(
+            str(text),
+            font=font,
+            font_size=font_size,
+            color=text_color or color,
+        )
+        mark.submobjects.sort(
+            key=lambda m: -m.get_center()[0]
+        )
 
     w = mark.width + 0.85
     h = mark.height + 0.65
@@ -95,22 +118,41 @@ def thought_bubble(
         fill_color=bg_color,
         fill_opacity=bg_opacity,
     )
+
     mark.move_to(box)
 
     bubble_core = VGroup(box, mark)
-    bubble_core.next_to(anchor_head, UP + RIGHT, buff=buff).shift(extra_shift)
+    bubble_core.next_to(
+        anchor_head,
+        UP + RIGHT,
+        buff=buff,
+    ).shift(extra_shift)
 
-    head_pos = anchor_head.get_top() + RIGHT * 0.15
-    box_corner = box.get_bottom() + LEFT * 0.25
+    # ==============================================================
+    # 3. حساب موضع دوائر التفكير (Thought Dots) بشكل قطري متناسق
+    # ==============================================================
+    # البداية: ملامسة تماماً لأعلى يمين محيط الرأس
+    start_point = anchor_head.get_top() + RIGHT * 0.08 + UP * 0.03
+    
+    # النهاية: موجهة نحو الزاوية السفلية اليسرى للصندوق مباشرة
+    end_point = box.get_corner(DL) + RIGHT * 0.22 + UP * 0.02
 
-    # الدائرة الأولى الصغيرة قرب الرأس
-    dot1 = Circle(radius=0.055, color=color, fill_color=color, fill_opacity=0.9).move_to(
-        head_pos * 0.68 + box_corner * 0.32
-    )
-    # الدائرة الثانية أبعدناها عن قاع البالونة (0.58 بدلاً من 0.70) حتى لا تلتصق بها
-    dot2 = Circle(radius=0.085, color=color, fill_color=color, fill_opacity=0.9).move_to(
-        head_pos * 0.42 + box_corner * 0.58
-    )
+    # توزيع نسبي متوازن يمتد من الرأس حتى الصندوق
+    dot1 = Circle(radius=0.035, stroke_width=0, fill_color=color, fill_opacity=0.9)\
+        .move_to(interpolate(start_point, end_point, 0.12))
+        
+    dot2 = Circle(radius=0.058, stroke_width=0, fill_color=color, fill_opacity=0.9)\
+        .move_to(interpolate(start_point, end_point, 0.42))
+        
+    dot3 = Circle(radius=0.088, stroke_width=0, fill_color=color, fill_opacity=0.9)\
+        .move_to(interpolate(start_point, end_point, 0.74))
 
-    dots = VGroup(dot1, dot2)
-    return box, dots, mark
+    dots = VGroup(dot1, dot2, dot3)
+
+    # ==============================================================
+    # نقاط بداية ونهاية تأثير الرسم
+    # ==============================================================
+    draw_start = mark.get_right() + RIGHT * 0.08
+    draw_end = mark.get_left() + RIGHT * 0.12
+
+    return box, dots, mark, draw_start, draw_end
