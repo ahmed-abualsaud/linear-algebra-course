@@ -10,81 +10,12 @@ from common.palette import (
     IVORY_WHITE,
 )
 from common.latex import mach_math_template
+from common.mobjects.card import MachCard
 
 
-def make_card_floor_glow(
-    card,
-    accent_color=GOLD_LIGHT,
-    reflection_offset=0.22,
-    reflection_opacity=0.30,
-):
-    """
-    إنشاء التوهج الأرضي ثلاثي الأبعاد وانعكاس الزجاج أسفل البطاقة
-    (متطابق تماماً مع خوارزمية وهندسة MachTable).
-    """
-    glow_group = VGroup()
-    w = card.width
-    h = card.height
-    corner_radius = 0.22
-    y_base = card.get_bottom()[1] - reflection_offset
-    center_x = card.get_center()[0]
-
-    # 1. طبقات التوهج البيضاوي المتدرج الناعم (Glow Layers)
-    n_glow_layers = 8
-    for i in range(n_glow_layers):
-        t = i / (n_glow_layers - 1)
-        w_layer = w * interpolate(0.85, 1.25, t)
-        h_layer = 0.35 * interpolate(0.35, 1.40, t)
-        op_layer = reflection_opacity * interpolate(0.65, 0.005, t**0.6)
-
-        glow_ellipse = Ellipse(
-            width=w_layer,
-            height=h_layer,
-            stroke_width=0,
-            fill_color=GOLD_MUTED if t > 0.4 else accent_color,
-            fill_opacity=op_layer,
-        ).move_to([center_x, y_base - h_layer * 0.25, 0])
-        glow_group.add(glow_ellipse)
-
-    # 2. شرائح الانعكاس المنظوري الزجاجي المتلاشي (Reflection Slices)
-    reflection_h = 0.45
-    p_top_l = np.array([center_x - w / 2 + corner_radius, card.get_bottom()[1], 0])
-    p_top_r = np.array([center_x + w / 2 - corner_radius, card.get_bottom()[1], 0])
-    p_bot_r = np.array([center_x + (w / 2 - corner_radius) * 1.05, card.get_bottom()[1] - reflection_h, 0])
-    p_bot_l = np.array([center_x - (w / 2 - corner_radius) * 1.05, card.get_bottom()[1] - reflection_h, 0])
-
-    n_refl_slices = 6
-    for j in range(n_refl_slices):
-        alpha_a = j / n_refl_slices
-        alpha_b = (j + 1) / n_refl_slices
-
-        pt_tl = interpolate(p_top_l, p_bot_l, alpha_a)
-        pt_tr = interpolate(p_top_r, p_bot_r, alpha_a)
-        pt_br = interpolate(p_top_r, p_bot_r, alpha_b)
-        pt_bl = interpolate(p_top_l, p_bot_l, alpha_b)
-
-        slice_op = reflection_opacity * 0.45 * ((1.0 - alpha_a) ** 1.8)
-
-        refl_slice = Polygon(
-            pt_tl, pt_tr, pt_br, pt_bl,
-            stroke_width=0,
-            fill_color=accent_color if alpha_a < 0.3 else GOLD_DARK,
-            fill_opacity=slice_op,
-        )
-        glow_group.add(refl_slice)
-
-    # 3. خط التماس المضيء
-    contact_line = Line(
-        p_top_l, p_top_r,
-        color=accent_color,
-        stroke_width=1.0,
-        stroke_opacity=reflection_opacity * 0.8,
-    )
-    glow_group.add(contact_line)
-    glow_group.set_z_index(-1)
-
-    return glow_group
-
+# ==============================================================
+# الرسوم التوضيحية للمحتوى (أيقونات متجهة ناعمة)
+# ==============================================================
 
 def make_scale_with_weight(color=GOLD_LIGHT, scale=1.0):
     """ميزان مختبرات رقمي دقيق مع شاشة واسعة وثقل معايرة فيزيائي."""
@@ -196,10 +127,10 @@ def make_building(color=COPPER_TERRA, scale=1.0):
     base_box = Rectangle(width=0.96, height=0.76, stroke_width=1.6, color=color, fill_color=color, fill_opacity=0.16)
     cornice = Rectangle(width=1.06, height=0.08, stroke_width=1.6, color=color, fill_color=color, fill_opacity=0.85)\
         .next_to(base_box, UP, buff=0)
-    
+
     attic_box = Rectangle(width=0.90, height=0.46, stroke_width=1.6, color=color, fill_color=color, fill_opacity=0.16)\
         .next_to(cornice, UP, buff=0)
-    
+
     roof = Rectangle(width=1.02, height=0.07, stroke_width=1.6, color=color, fill_color=color, fill_opacity=0.85)\
         .next_to(attic_box, UP, buff=0)
 
@@ -232,7 +163,7 @@ def make_building(color=COPPER_TERRA, scale=1.0):
 def play_scene04(scene):
 
     # ==============================================================
-    # 1. إحداثيات الشبكة الموحدة (Grid Coordinates)
+    # 1. إعداد البطاقات الثلاث عبر MachCard
     # ==============================================================
     card_w, card_h = 3.85, 5.4
 
@@ -240,39 +171,59 @@ def play_scene04(scene):
     X_CENTER =  0.0
     X_RIGHT  =  4.1
 
-    Y_ROW1 =  0.55   # الصف العلوي (الميزان - التفاحات - الطول)
-    Y_ROW2 = -1.35   # الصف السفلي (الساعة - المبنى - الزاوية)
+    Y_ROW1 =  0.55   # الصف العلوي (الميزان - التفاحات - المسطرة)
+    Y_ROW2 = -1.35   # الصف السفلي (الساعة - المبنى - المنقلة)
 
-    # 1. البطاقات الثلاث
-    card_phys = RoundedRectangle(
-        corner_radius=0.22, width=card_w, height=card_h,
-        color=STONE_AXIS, stroke_width=1.4, fill_color="#18140E", fill_opacity=0.85
-    ).move_to([X_LEFT, 0, 0])
+    # 1. بطاقة الكميات الفيزيائية (اليسار)
+    card_phys = MachCard(
+        width=card_w,
+        height=card_h,
+        center=[X_LEFT, 0, 0],
+        title="كميات فيزيائية",
+        title_font="Cairo",
+        title_font_size=20,
+        title_color=GOLD_LIGHT,
+        accent_color=GOLD_LIGHT,
+        show_divider=False,
+        corner_radius=0.22,
+        content_padding=0.28,
+        background_color="#18140E",
+        background_opacity=0.85,
+    )
 
-    card_count = RoundedRectangle(
-        corner_radius=0.22, width=card_w, height=card_h,
-        color=STONE_AXIS, stroke_width=1.4, fill_color="#18140E", fill_opacity=0.85
-    ).move_to([X_CENTER, 0, 0])
+    # 2. بطاقة الأشياء المعدودة (الوسط)
+    card_count = MachCard(
+        width=card_w,
+        height=card_h,
+        center=[X_CENTER, 0, 0],
+        title="أشياء معدودة",
+        title_font="Cairo",
+        title_font_size=20,
+        title_color=COPPER_TERRA,
+        accent_color=COPPER_TERRA,
+        show_divider=False,
+        corner_radius=0.22,
+        content_padding=0.28,
+        background_color="#18140E",
+        background_opacity=0.85,
+    )
 
-    card_geom = RoundedRectangle(
-        corner_radius=0.22, width=card_w, height=card_h,
-        color=STONE_AXIS, stroke_width=1.4, fill_color="#18140E", fill_opacity=0.85
-    ).move_to([X_RIGHT, 0, 0])
-
-    # 2. الإضاءة الأرضية والانعكاس ثلاثي الأبعاد أسفل كل بطاقة
-    glow_phys  = make_card_floor_glow(card_phys, accent_color=GOLD_LIGHT)
-    glow_count = make_card_floor_glow(card_count, accent_color=COPPER_TERRA)
-    glow_geom  = make_card_floor_glow(card_geom, accent_color=GOLD_LIGHT)
-
-    # 3. العناوين
-    title_phys = Text("كميات فيزيائية", font="Cairo", font_size=20, color=GOLD_LIGHT)\
-        .next_to(card_phys.get_top(), DOWN, buff=0.28)
-
-    title_count = Text("أشياء معدودة", font="Cairo", font_size=20, color=COPPER_TERRA)\
-        .next_to(card_count.get_top(), DOWN, buff=0.28)
-
-    title_geom = Text("كميات هندسية", font="Cairo", font_size=20, color=GOLD_LIGHT)\
-        .next_to(card_geom.get_top(), DOWN, buff=0.28)
+    # 3. بطاقة الكميات الهندسية (اليمين)
+    card_geom = MachCard(
+        width=card_w,
+        height=card_h,
+        center=[X_RIGHT, 0, 0],
+        title="كميات هندسية",
+        title_font="Cairo",
+        title_font_size=20,
+        title_color=GOLD_LIGHT,
+        accent_color=GOLD_LIGHT,
+        show_divider=False,
+        corner_radius=0.22,
+        content_padding=0.28,
+        background_color="#18140E",
+        background_opacity=0.85,
+    )
 
     # ==============================================================
     # 2. الصف العلوي (Row 1): ميزان بوزن 3.5kg - 4 تفاحات - مسطرة 3m
@@ -341,15 +292,12 @@ def play_scene04(scene):
     row_angle = VGroup(angle_base, angle_arc, angle_center_dot, prot_ticks, angle_text).move_to([X_RIGHT, Y_ROW2, 0])
 
     # ==============================================================
-    # 4. التزامن الصوتي المحسوب للمشهد الرابع
+    # 4. التزامن الحركي والصوتي المحسوب للمشهد
     # ==============================================================
 
-    # أ) ظهور البطاقة الأولى مع إضاءتها الأرضية (الفيزياء)
+    # أ) ظهور البطاقة الأولى (الفيزياء) عبر animate_shell
     scene.play(
-        FadeIn(card_phys, shift=UP * 0.2),
-        FadeIn(glow_phys),
-        FadeIn(title_phys),
-        run_time=0.8,
+        card_phys.animate_shell(run_time=0.8),
     )
     scene.play(
         FadeIn(row_weight, shift=RIGHT * 0.2),
@@ -360,12 +308,9 @@ def play_scene04(scene):
         run_time=0.7,
     )
 
-    # ب) ظهور البطاقة الثانية مع إضاءتها الأرضية (أشياء معدودة)
+    # ب) ظهور البطاقة الثانية (أشياء معدودة)
     scene.play(
-        FadeIn(card_count, shift=UP * 0.2),
-        FadeIn(glow_count),
-        FadeIn(title_count),
-        run_time=0.8,
+        card_count.animate_shell(run_time=0.8),
     )
     scene.play(
         FadeIn(row_apples, shift=UP * 0.15),
@@ -376,12 +321,9 @@ def play_scene04(scene):
         run_time=0.7,
     )
 
-    # ج) ظهور البطاقة الثالثة مع إضاءتها الأرضية (كميات هندسية)
+    # ج) ظهور البطاقة الثالثة (كميات هندسية)
     scene.play(
-        FadeIn(card_geom, shift=UP * 0.2),
-        FadeIn(glow_geom),
-        FadeIn(title_geom),
-        run_time=0.8,
+        card_geom.animate_shell(run_time=0.8),
     )
     scene.play(
         Create(measure_line),
@@ -404,9 +346,9 @@ def play_scene04(scene):
 
     # هـ) تفريغ المشهد بالكامل
     all_content = Group(
-        card_phys, glow_phys, title_phys, row_weight, row_time,
-        card_count, glow_count, title_count, row_apples, row_floor,
-        card_geom, glow_geom, title_geom, row_length, row_angle,
+        card_phys, row_weight, row_time,
+        card_count, row_apples, row_floor,
+        card_geom, row_length, row_angle,
     )
 
     scene.play(

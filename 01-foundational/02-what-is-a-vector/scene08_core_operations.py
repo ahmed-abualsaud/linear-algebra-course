@@ -9,155 +9,34 @@ from common.palette import (
     COPPER_TERRA,
     IVORY_WHITE,
 )
+from common.mobjects.card import MachCard
 from common.latex import mach_math_template
-
+from common.mobjects.vectors import MachVector
 
 # ==============================================================
-# كلاس المتجه المعتمد الخاص بقناة MACH-MATH
+# كود المشهد الثامن (Scene 08)
 # ==============================================================
-class MachVector(VGroup):
-    """المتجه الرسمي المخصص لقناة MACH-MATH."""
-    def __init__(
-        self,
-        start=ORIGIN,
-        end=RIGHT,
-        color=COPPER_TERRA,
-        stroke_width=3.0,
-        tip_length=0.22,
-        tip_angle=PI / 5.5,
-        show_pivot=True,
-        pivot_radius=0.045,
-        **kwargs
-    ):
-        super().__init__(**kwargs)
-        self.start = np.array(start)
-        self.end = np.array(end)
-        self.color = color
-
-        direction = self.end - self.start
-        length = np.linalg.norm(direction)
-        unit_dir = RIGHT if length == 0 else direction / length
-
-        actual_end = self.end - unit_dir * (tip_length * 0.8)
-        self.line = Line(self.start, actual_end, color=color, stroke_width=stroke_width, buff=0)
-
-        left_angle = np.arctan2(unit_dir[1], unit_dir[0]) + PI - tip_angle
-        right_angle = np.arctan2(unit_dir[1], unit_dir[0]) + PI + tip_angle
-
-        wing_left = self.end + tip_length * np.array([np.cos(left_angle), np.sin(left_angle), 0])
-        wing_right = self.end + tip_length * np.array([np.cos(right_angle), np.sin(right_angle), 0])
-
-        self.tip = Polygon(
-            self.end,
-            wing_left,
-            self.end - unit_dir * (tip_length * 0.35),
-            wing_right,
-            color=color,
-            fill_color=color,
-            fill_opacity=1.0,
-            stroke_width=0,
-        )
-        self.add(self.line, self.tip)
-
-        if show_pivot:
-            self.pivot = Dot(self.start, radius=pivot_radius, color=color)
-            self.add(self.pivot)
-
-
-def make_card_floor_glow(
-    card,
-    accent_color=GOLD_LIGHT,
-    reflection_offset=0.22,
-    reflection_opacity=0.30,
-):
-    """بناء الانعكاس الأرضي والتوهج ثلاثي الأبعاد أسفل البطاقة بمطابقة خوارزمية MachTable."""
-    glow_group = VGroup()
-    w = card.width
-    corner_radius = 0.22
-    y_base = card.get_bottom()[1] - reflection_offset
-    center_x = card.get_center()[0]
-
-    # 1. طبقات التوهج البيضاوي
-    n_glow_layers = 10
-    for i in range(n_glow_layers):
-        t = i / (n_glow_layers - 1)
-        w_layer = w * interpolate(0.85, 1.25, t)
-        h_layer = 0.38 * interpolate(0.35, 1.45, t)
-        op_layer = reflection_opacity * interpolate(0.65, 0.005, t**0.6)
-
-        glow_ellipse = Ellipse(
-            width=w_layer, height=h_layer, stroke_width=0,
-            fill_color=GOLD_MUTED if t > 0.4 else accent_color,
-            fill_opacity=op_layer,
-        ).move_to([center_x, y_base - h_layer * 0.25, 0])
-        glow_group.add(glow_ellipse)
-
-    # 2. شرائح الانعكاس المنظوري الزجاجي
-    reflection_h = 0.45
-    p_top_l = np.array([center_x - w / 2 + corner_radius, card.get_bottom()[1], 0])
-    p_top_r = np.array([center_x + w / 2 - corner_radius, card.get_bottom()[1], 0])
-    p_bot_r = np.array([center_x + (w / 2 - corner_radius) * 1.05, card.get_bottom()[1] - reflection_h, 0])
-    p_bot_l = np.array([center_x - (w / 2 - corner_radius) * 1.05, card.get_bottom()[1] - reflection_h, 0])
-
-    n_refl_slices = 8
-    for j in range(n_refl_slices):
-        alpha_a = j / n_refl_slices
-        alpha_b = (j + 1) / n_refl_slices
-
-        pt_tl = interpolate(p_top_l, p_bot_l, alpha_a)
-        pt_tr = interpolate(p_top_r, p_bot_r, alpha_a)
-        pt_br = interpolate(p_top_r, p_bot_r, alpha_b)
-        pt_bl = interpolate(p_top_l, p_bot_l, alpha_b)
-
-        slice_op = reflection_opacity * 0.45 * ((1.0 - alpha_a) ** 1.8)
-
-        refl_slice = Polygon(
-            pt_tl, pt_tr, pt_br, pt_bl, stroke_width=0,
-            fill_color=accent_color if alpha_a < 0.3 else GOLD_DARK,
-            fill_opacity=slice_op,
-        )
-        glow_group.add(refl_slice)
-
-    contact_line = Line(
-        p_top_l, p_top_r, color=accent_color,
-        stroke_width=1.0, stroke_opacity=reflection_opacity * 0.8,
-    )
-    glow_group.add(contact_line)
-    glow_group.set_z_index(-1)
-    return glow_group
-
 
 def play_scene08(scene):
 
     # ==============================================================
-    # 1. المرحلة الأولى: شرط ومعيار الانتماء لفضاء المتجهات (أبعاد ملمومة)
+    # 1. المرحلة الأولى: شرط ومعيار الانتماء لفضاء المتجهات
     # ==============================================================
-    # تقليص الارتفاع إلى 3.4 ليصبح متماسكاً وأنيقاً تماماً
     crit_w, crit_h = 9.8, 3.4
     crit_center_y = 0.1
 
-    crit_bg = RoundedRectangle(
-        corner_radius=0.26, width=crit_w, height=crit_h,
-        stroke_width=1.4, color=GOLD_LIGHT, stroke_opacity=0.45,
-        fill_color="#100D07", fill_opacity=0.88,
-    ).move_to([0, crit_center_y, 0])
-
-    crit_glass = RoundedRectangle(
-        corner_radius=0.22, width=crit_w - 0.12, height=crit_h - 0.12,
-        stroke_width=0.5, color=GOLD_LIGHT, stroke_opacity=0.18,
-        fill_color=GOLD_LIGHT, fill_opacity=0.038,
-    ).move_to(crit_bg.get_center())
-
-    crit_glow = make_card_floor_glow(crit_bg, accent_color=GOLD_LIGHT)
-
-    crit_title = MarkupText(
-        "معيار الانتماء لفضاء المتجهات",
-        font="Cairo", font_size=23, color=GOLD_LIGHT,
-    ).next_to(crit_bg.get_top(), DOWN, buff=0.28)
-
-    crit_divider = Line(
-        crit_bg.get_top() + DOWN * 0.85, crit_bg.get_bottom() + UP * 0.28,
-        stroke_width=1.0, color=GOLD_DARK, stroke_opacity=0.45,
+    # بناء بطاقة المعيار باستخدام MachCard
+    crit_card = MachCard(
+        width=crit_w,
+        height=crit_h,
+        center=[0, crit_center_y, 0],
+        corner_radius=0.26,
+        accent_color=GOLD_LIGHT,
+        title="معيار الانتماء لفضاء المتجهات",
+        title_font_size=23,
+        show_divider=True,
+        divider_style="vertical",  # فاصل رأسي يقسم البطاقة لعمودين
+        auto_fit_content=False,
     )
 
     # ---------------- الجانب الأيمن: تنطبق القواعد ----------------
@@ -176,22 +55,17 @@ def play_scene08(scene):
     row_cross = VGroup(math_cross, lbl_cross).arrange(LEFT, buff=0.14)
     box_left = VGroup(icon_cross, txt_cross_1, row_cross).arrange(DOWN, buff=0.16).move_to([-2.4, crit_center_y - 0.22, 0])
 
-    criterion_group = VGroup(
-        crit_glow, crit_bg, crit_glass, crit_title, crit_divider,
-        box_right, box_left
-    )
-
-    # أ) بناء الإطار والعنوان
+    # أ) بناء الإطار والعنوان والفاصل الرأسي
     scene.play(
-        Create(crit_bg),
-        FadeIn(crit_title),
-        Create(crit_divider),
+        Create(crit_card.body),
+        FadeIn(crit_card.title_group),
+        Create(crit_card.divider),
         run_time=0.9,
     )
     # ب) اشتعال الإضاءة والانعكاس مع ظهور الجانب الأيمن
     scene.play(
-        FadeIn(crit_glow),
-        FadeIn(crit_glass),
+        FadeIn(crit_card.reflection),
+        FadeIn(crit_card.glass),
         FadeIn(box_right, shift=LEFT * 0.2),
         run_time=0.8,
     )
@@ -204,9 +78,9 @@ def play_scene08(scene):
     )
     scene.wait(2.5)
 
-    # د) تفريغ لوحة المعيار
+    # د) تفريغ لوحة المعيار بالكامل
     scene.play(
-        FadeOut(criterion_group),
+        FadeOut(VGroup(crit_card, box_right, box_left)),
         run_time=0.8,
     )
     scene.wait(0.3)
@@ -219,38 +93,34 @@ def play_scene08(scene):
     X_OP_LEFT  = -3.1
 
     # ---------------- 1. بطاقة جمع المتجهات (يمين) ----------------
-    card_add = RoundedRectangle(
-        corner_radius=0.28, width=card_op_w, height=card_op_h,
-        stroke_width=1.4, color=GOLD_LIGHT, stroke_opacity=0.45,
-        fill_color="#100D07", fill_opacity=0.85,
-    ).move_to([X_OP_RIGHT, 0, 0])
-
-    glass_add = RoundedRectangle(
-        corner_radius=0.24, width=card_op_w - 0.12, height=card_op_h - 0.12,
-        stroke_width=0.5, color=GOLD_LIGHT, stroke_opacity=0.18,
-        fill_color=GOLD_LIGHT, fill_opacity=0.038,
-    ).move_to(card_add.get_center())
-
-    glow_add = make_card_floor_glow(card_add, accent_color=GOLD_LIGHT)
-
-    title_op_add = MarkupText("1. جمع المتجهات", font="Cairo", font_size=23, color=GOLD_LIGHT)\
-        .next_to(card_add.get_top(), DOWN, buff=0.35)
-    subtitle_op_add = Text("Vector Addition", font="Cairo", font_size=14, color=STONE_AXIS)\
-        .next_to(title_op_add, DOWN, buff=0.10)
+    card_add = MachCard(
+        width=card_op_w,
+        height=card_op_h,
+        center=[X_OP_RIGHT, 0, 0],
+        corner_radius=0.28,
+        accent_color=GOLD_LIGHT,
+        title="1. جمع المتجهات",
+        title_font_size=23,
+        subtitle="Vector Addition",
+        subtitle_font_size=14,
+        subtitle_color=STONE_AXIS,
+        show_divider=False,
+        auto_fit_content=False,
+    )
 
     math_op_add = MathTex(
         r"\mathbf{u} + \mathbf{v}",
         tex_template=mach_math_template,
         font_size=34,
         color=GOLD_BRIGHT,
-    ).next_to(subtitle_op_add, DOWN, buff=0.20)
+    ).next_to(card_add.title_group, DOWN, buff=0.20)
 
     desc_add = MathTex(
         r"\mathbf{u}, \mathbf{v} \in V \implies (\mathbf{u} + \mathbf{v}) \in V",
         tex_template=mach_math_template,
         font_size=21,
         color=IVORY_WHITE,
-    ).next_to(card_add.get_bottom(), UP, buff=0.35)
+    ).next_to(card_add.body.get_bottom(), UP, buff=0.35)
 
     O_add = np.array([X_OP_RIGHT - 1.05, -0.75, 0])
     P_u   = O_add + np.array([1.25, 0.35, 0])
@@ -271,38 +141,35 @@ def play_scene08(scene):
     add_geo_group = VGroup(vec_u, lbl_u, vec_v, lbl_v, vec_sum, lbl_sum)
 
     # ---------------- 2. بطاقة الضرب القياسي (يسار) ----------------
-    card_scalar = RoundedRectangle(
-        corner_radius=0.28, width=card_op_w, height=card_op_h,
-        stroke_width=1.4, color=COPPER_TERRA, stroke_opacity=0.45,
-        fill_color="#100D07", fill_opacity=0.85,
-    ).move_to([X_OP_LEFT, 0, 0])
-
-    glass_scalar = RoundedRectangle(
-        corner_radius=0.24, width=card_op_w - 0.12, height=card_op_h - 0.12,
-        stroke_width=0.5, color=COPPER_TERRA, stroke_opacity=0.18,
-        fill_color=COPPER_TERRA, fill_opacity=0.038,
-    ).move_to(card_scalar.get_center())
-
-    glow_scalar = make_card_floor_glow(card_scalar, accent_color=COPPER_TERRA)
-
-    title_op_scalar = MarkupText("2. الضرب في رقم (قياسي)", font="Cairo", font_size=23, color=COPPER_TERRA)\
-        .next_to(card_scalar.get_top(), DOWN, buff=0.35)
-    subtitle_op_scalar = Text("Scalar Multiplication", font="Cairo", font_size=14, color=STONE_AXIS)\
-        .next_to(title_op_scalar, DOWN, buff=0.10)
+    card_scalar = MachCard(
+        width=card_op_w,
+        height=card_op_h,
+        center=[X_OP_LEFT, 0, 0],
+        corner_radius=0.28,
+        accent_color=COPPER_TERRA,
+        title="2. الضرب في رقم (قياسي)",
+        title_color=COPPER_TERRA,
+        title_font_size=23,
+        subtitle="Scalar Multiplication",
+        subtitle_font_size=14,
+        subtitle_color=STONE_AXIS,
+        show_divider=False,
+        auto_fit_content=False,
+    )
 
     math_op_scalar = MathTex(
         r"c \cdot \mathbf{v}",
         tex_template=mach_math_template,
         font_size=34,
         color=COPPER_TERRA,
-    ).next_to(subtitle_op_scalar, DOWN, buff=0.20)
+    ).next_to(card_scalar.title_group, DOWN, buff=0.20)
 
     desc_scalar = MathTex(
         r"c \in \mathbb{R}, \; \mathbf{v} \in V \implies c\mathbf{v} \in V",
         tex_template=mach_math_template,
         font_size=21,
         color=IVORY_WHITE,
-    ).next_to(card_scalar.get_bottom(), UP, buff=0.35)
+    ).next_to(card_scalar.body.get_bottom(), UP, buff=0.35)
 
     O_scale  = np.array([X_OP_LEFT - 1.05, -0.65, 0])
     P_orig   = O_scale + np.array([0.85, 0.50, 0])
@@ -320,28 +187,28 @@ def play_scene08(scene):
 
     scale_geo_group = VGroup(vec_scaled, lbl_scaled, vec_orig, lbl_orig)
 
-    # بناء إطارات البطاقتين أولاً ثم اشتعال التوهج
+    # بناء إطارات البطاقتين والعناوين أولاً
     scene.play(
-        Create(card_add),
-        Create(card_scalar),
-        FadeIn(title_op_add),
-        FadeIn(subtitle_op_add),
-        FadeIn(title_op_scalar),
-        FadeIn(subtitle_op_scalar),
+        Create(card_add.body),
+        Create(card_scalar.body),
+        FadeIn(card_add.title_group),
+        FadeIn(card_scalar.title_group),
         run_time=1.0,
     )
 
+    # اشتعال التوهج والزجاج بالتوازي مع ظهور العبارات الرياضية
     scene.play(
-        FadeIn(glow_add),
-        FadeIn(glass_add),
-        FadeIn(glow_scalar),
-        FadeIn(glass_scalar),
+        FadeIn(card_add.reflection),
+        FadeIn(card_add.glass),
+        FadeIn(card_scalar.reflection),
+        FadeIn(card_scalar.glass),
         FadeIn(math_op_add),
         FadeIn(math_op_scalar),
         run_time=0.55,
         rate_func=smooth,
     )
 
+    # رسم المتجهات خطوة بخطوة بالترتيب الهندسي الدقيق
     scene.play(
         GrowFromPoint(vec_u, O_add),
         FadeIn(lbl_u),
@@ -372,8 +239,8 @@ def play_scene08(scene):
     # 3. تفريغ المشهد للانتقال للمشهد التاسع
     # ==============================================================
     all_scene = Group(
-        card_add, glass_add, glow_add, title_op_add, subtitle_op_add, math_op_add, desc_add, add_geo_group,
-        card_scalar, glass_scalar, glow_scalar, title_op_scalar, subtitle_op_scalar, math_op_scalar, desc_scalar, scale_geo_group
+        card_add, math_op_add, desc_add, add_geo_group,
+        card_scalar, math_op_scalar, desc_scalar, scale_geo_group
     )
 
     scene.play(
