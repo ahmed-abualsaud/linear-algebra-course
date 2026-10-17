@@ -20,7 +20,8 @@ from common.mobjects.vectors import MachVector
 def play_scene08(scene):
 
     # ==============================================================
-    # 1. المرحلة الأولى: شرط ومعيار الانتماء لفضاء المتجهات
+    # 1. المرحلة الأولى: شرط ومعيار الانتماء لفضاء المتجهات (17.5 ث)
+    # [03:52.0 -> 04:09.5 في التراك الصوتي]
     # ==============================================================
     crit_w, crit_h = 9.8, 3.4
     crit_center_y = 0.1
@@ -55,38 +56,46 @@ def play_scene08(scene):
     row_cross = VGroup(math_cross, lbl_cross).arrange(LEFT, buff=0.14)
     box_left = VGroup(icon_cross, txt_cross_1, row_cross).arrange(DOWN, buff=0.16).move_to([-2.4, crit_center_y - 0.22, 0])
 
-    # أ) بناء الإطار والعنوان والفاصل الرأسي
+    # أ) بناء الإطار والفاصل الرأسي مع جملة:
+    # "أي شيء في الدنيا نقدر نطبق عليه كل القواعد دي بنعتبره متجه..." [03:52.0 - 03:53.0]
     scene.play(
         Create(crit_card.body),
         FadeIn(crit_card.title_group),
         Create(crit_card.divider),
-        run_time=0.9,
+        run_time=1.0,
     )
-    # ب) اشتعال الإضاءة والانعكاس مع ظهور الجانب الأيمن
+
+    # ظهور الجانب الأيمن (تنطبق القواعد -> متجه) [03:53.0 - 03:54.0]
     scene.play(
         FadeIn(crit_card.reflection),
         FadeIn(crit_card.glass),
         FadeIn(box_right, shift=LEFT * 0.2),
-        run_time=0.8,
+        run_time=1.0,
     )
-    scene.wait(1.5)
 
-    # ج) ظهور الجانب الأيسر
+    # استماع أثناء "...وساعتها بيكون جزء من فضاء المتجهات" [03:54.0 - 04:01.0]
+    scene.wait(7.0)
+
+    # ب) ظهور الجانب الأيسر مع جملة:
+    # "ولو في قاعدة واحدة من القواعد دي ما قدرناش نطبقها..." [04:01.0 - 04:02.0]
     scene.play(
         FadeIn(box_left, shift=RIGHT * 0.2),
-        run_time=0.8,
+        run_time=1.0,
     )
-    scene.wait(2.5)
 
-    # د) تفريغ لوحة المعيار بالكامل
+    # استماع أثناء "...ساعتها مش بنعتبره جزء من فضاء المتجهات" [04:02.0 - 04:08.0]
+    scene.wait(6.0)
+
+    # تفريغ لوحة المعيار بالكامل [04:08.0 - 04:09.0]
     scene.play(
         FadeOut(VGroup(crit_card, box_right, box_left)),
-        run_time=0.8,
+        run_time=1.0,
     )
-    scene.wait(0.3)
+    scene.wait(0.5)
 
     # ==============================================================
-    # 2. المرحلة الثانية: اختزال القواعد (الجمع والضرب في ثابت) بصرياً
+    # 2. المرحلة الثانية: اختزال القواعد هندسياً (20.5 ث)
+    # [04:09.5 -> 04:30.0 في التراك الصوتي]
     # ==============================================================
     card_op_w, card_op_h = 5.8, 5.5
     X_OP_RIGHT = 3.1
@@ -187,16 +196,17 @@ def play_scene08(scene):
 
     scale_geo_group = VGroup(vec_scaled, lbl_scaled, vec_orig, lbl_orig)
 
-    # بناء إطارات البطاقتين والعناوين أولاً
+    # بناء إطارات البطاقتين مع جملة:
+    # "طبعاً انت مش لازم تحفظ القواعد دي..." [04:09.5 - 04:10.7]
     scene.play(
         Create(card_add.body),
         Create(card_scalar.body),
         FadeIn(card_add.title_group),
         FadeIn(card_scalar.title_group),
-        run_time=1.0,
+        run_time=1.2,
     )
 
-    # اشتعال التوهج والزجاج بالتوازي مع ظهور العبارات الرياضية
+    # اشتعال التوهج وظهور العمليات الأساسية [04:10.7 - 04:11.5]
     scene.play(
         FadeIn(card_add.reflection),
         FadeIn(card_add.glass),
@@ -204,19 +214,24 @@ def play_scene08(scene):
         FadeIn(card_scalar.glass),
         FadeIn(math_op_add),
         FadeIn(math_op_scalar),
-        run_time=0.55,
+        run_time=0.8,
         rate_func=smooth,
     )
 
-    # رسم المتجهات خطوة بخطوة بالترتيب الهندسي الدقيق
+    # استماع أثناء: "...لكن اللي لازم تعمله هو إنك تعرف إزاي تطبق القواعد دي على المتجهات، وده اللي هنتعلمه خلال السلسلة دي بإذن الله"
+    # [04:11.5 - 04:21.0]
+    scene.wait(9.5)
+
+    # ج) انطلاق الرسم الهندسي مع جملة: "وملخص القواعد دي كلها ببساطة..." [04:21.0 - 04:22.0]
     scene.play(
         GrowFromPoint(vec_u, O_add),
         FadeIn(lbl_u),
         GrowFromPoint(vec_orig, O_scale),
         FadeIn(lbl_orig),
-        run_time=0.9,
+        run_time=1.0,
     )
 
+    # رسم المتجه الثاني والتمدد مع "...هي إننا نقدر نجمع المتجهات..." [04:22.0 - 04:23.0]
     scene.play(
         GrowFromPoint(vec_v, P_u),
         FadeIn(lbl_v),
@@ -225,18 +240,21 @@ def play_scene08(scene):
         run_time=1.0,
     )
 
+    # إغلاق مثلث الجمع والمحصله مع "...ونقدر نضربها في أرقام" [04:23.0 - 04:24.2]
     scene.play(
         GrowFromPoint(vec_sum, O_add),
         FadeIn(lbl_sum),
         FadeIn(desc_add, shift=UP * 0.1),
         FadeIn(desc_scalar, shift=UP * 0.1),
-        run_time=1.1,
+        run_time=1.2,
     )
 
-    scene.wait(4.5)
+    # استقرار هندسي لاستيعاب الفكرة [04:24.2 - 04:28.2]
+    scene.wait(4.0)
 
     # ==============================================================
-    # 3. تفريغ المشهد للانتقال للمشهد التاسع
+    # 3. تفريغ المشهد للانتقال للمشهد التاسع والأخير (1.8 ث)
+    # [04:28.2 -> 04:30.0 في التراك الصوتي]
     # ==============================================================
     all_scene = Group(
         card_add, math_op_add, desc_add, add_geo_group,
@@ -245,6 +263,6 @@ def play_scene08(scene):
 
     scene.play(
         FadeOut(all_scene),
-        run_time=0.9,
+        run_time=1.0,
     )
-    scene.wait(0.5)
+    scene.wait(0.8)  # سكون الانتقال النظيف للمشهد التاسع عند 04:30.0

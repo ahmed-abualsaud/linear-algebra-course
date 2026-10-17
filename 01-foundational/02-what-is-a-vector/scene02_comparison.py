@@ -1,4 +1,5 @@
 from manim import *
+from common.latex import mach_math_template
 from common.mobjects.coordinate_systems import (
     MachAxes,
     MachNumberLine,
@@ -9,7 +10,6 @@ from common.palette import (
     GOLD_LIGHT,
     IVORY_WHITE,
 )
-from common.latex import mach_math_template
 
 
 def play_scene02(scene):
@@ -17,7 +17,6 @@ def play_scene02(scene):
     # ==========================================================
     # 1. TABLE (3 أعمدة بكامل أبعاد الغرفة)
     # ==========================================================
-
     table = MachTable(
         rows=4,
         cols=3,
@@ -32,7 +31,6 @@ def play_scene02(scene):
     # ==========================================================
     # 2. TITLES (الصف 0)
     # ==========================================================
-
     title_linear = Text(
         "الجبر الخطي",
         font="Cairo",
@@ -61,12 +59,11 @@ def play_scene02(scene):
     # ==========================================================
     # 3. SUBTITLES (الصف 1)
     # ==========================================================
-
     sub_vectors = MarkupText(
         "متجهات",
         font="Cairo",
         font_size=24,
-        color=GOLD_LIGHT,   # تمييز المتجهات باللون الذهبي
+        color=GOLD_LIGHT,
     )
 
     sub_funcs = MarkupText(
@@ -90,7 +87,6 @@ def play_scene02(scene):
     # ==========================================================
     # 4. GRAPHS & NUMBER LINE (الصف 2)
     # ==========================================================
-
     # العمود 0: شبكة محاور + متجه
     vec_axes = MachAxes(
         x_range=[-2, 2, 1],
@@ -137,7 +133,6 @@ def play_scene02(scene):
     # ==========================================================
     # 5. OPERATIONS & QUESTION BADGE (الصف 3)
     # ==========================================================
-
     circle_glow = Circle(
         radius=0.48,
         color=GOLD_LIGHT,
@@ -184,10 +179,12 @@ def play_scene02(scene):
     )
 
     # ==========================================================
-    # 6. التزامن الصوتي المحسوب (المشهد الثاني)
+    # 6. التزامن الصوتي المحسوب (إجمالي المشهد: 45.0 ثانية)
+    # [00:13.0 -> 00:58.0 في التراك الصوتي]
     # ==========================================================
 
-    # أ) بناء وتشييد هيكل الجدول أولاً (2.0s)
+    # أ) بناء الجدول وظهور محتوياته (3.2 ث)
+    # "لو فاكر من الحلقة اللي فاتت إني عرضتلك في الجدول ده..." [00:13.0 - 00:16.2]
     scene.play(
         table.construct(
             run_time=2.0,
@@ -195,65 +192,118 @@ def play_scene02(scene):
             center_point=True,
         )
     )
-
-    # ب) ظهور محتويات الجدول بالكامل بعد اكتمال البناء (1.0s)
     scene.play(
         FadeIn(all_content),
-        run_time=1.0,
+        run_time=1.2,
     )
 
-    # "لو فاكر من الحلقة اللي فاتت إني عرضتلك في الجدول مقارنة بين الحساب والتفاضل والتكامل والجبر الخطي..."
-    scene.wait(2.5)
+    # استكمال الجملة: "...مقارنة بين علم الحساب والتفاضل والتكامل والجبر الخطي" [00:16.2 - 00:21.5]
+    scene.wait(5.3)
 
-    # ج) وميض / نبض عند ذكر "الرقم، الدالة، المتجه"
-    # "وقلنا إن كل واحد فيهم بيتعامل مع حاجة معينة زي الرقم في علم الحساب..."
-    scene.play(
-        sub_numbers.animate.scale(1.2).set_color(GOLD_LIGHT),
-        run_time=0.6,
-    )
-    scene.play(
-        sub_numbers.animate.scale(1/1.2).set_color(IVORY_WHITE),
-        run_time=0.4,
-    )
-
-    # "... أو الدالة في علم التفاضل والتكامل..."
-    scene.play(
-        sub_funcs.animate.scale(1.2).set_color(GOLD_LIGHT),
-        run_time=0.6,
-    )
-    scene.play(
-        sub_funcs.animate.scale(1/1.2).set_color(IVORY_WHITE),
-        run_time=0.4,
-    )
-
-    # "... أو المتجه في الجبر الخطي..."
-    scene.play(
-        sub_vectors.animate.scale(1.25),
-        question_badge.animate.scale(1.15),
-        run_time=0.7,
-    )
-    scene.play(
-        sub_vectors.animate.scale(1/1.25),
-        question_badge.animate.scale(1/1.15),
-        run_time=0.5,
-    )
-
-    # د) طرح الأسئلة الفلسفية الصعبة الثلاثة
-    # "فلو سألنا إيه هو المتجه ده بالظبط... كأني بسأل إيه هو العدد أصلاً؟ أو إيه هي الدالة؟"
-    # "وبصراحة الـ 3 أسئلة أصعب من بعض وإجابتهم مش سهلة إطلاقاً."
-    scene.play(
-        Wiggle(sub_numbers, scale_value=1.1, rotation_angle=0.03 * TAU),
-        Wiggle(sub_funcs, scale_value=1.1, rotation_angle=0.03 * TAU),
-        Wiggle(sub_vectors, scale_value=1.1, rotation_angle=0.03 * TAU),
-        run_time=2.0,
-    )
+    # "وقلنا إن كل واحد فيهم بيتعامل مع حاجة معينة..." [00:21.5 - 00:25.5]
     scene.wait(4.0)
 
-    # هـ) تفريغ المشهد للانتقال للمشهد الثالث
+    # ب) نبض "الأعداد في علم الحساب" (2.5 ث)
+    # "...زي الأعداد في علم الحساب..." [00:25.5 - 00:28.0]
+    scene.play(
+        sub_numbers.animate.scale(1.2).set_color(GOLD_LIGHT),
+        num_line.animate.set_color(GOLD_LIGHT),
+        run_time=0.8,
+    )
+    scene.play(
+        sub_numbers.animate.scale(1 / 1.2).set_color(IVORY_WHITE),
+        num_line.animate.set_color(WHITE),
+        run_time=0.5,
+    )
+    scene.wait(1.2)
+
+    # ج) نبض "الدوال في علم التفاضل والتكامل" (2.5 ث)
+    # "...والدوال في علم التفاضل والتكامل..." [00:28.0 - 00:30.5]
+    scene.play(
+        sub_funcs.animate.scale(1.2).set_color(GOLD_LIGHT),
+        mini_curve.animate.set_color(GOLD_LIGHT),
+        run_time=0.8,
+    )
+    scene.play(
+        sub_funcs.animate.scale(1 / 1.2).set_color(IVORY_WHITE),
+        mini_curve.animate.set_color(COPPER_TERRA),
+        run_time=0.5,
+    )
+    scene.wait(1.2)
+
+    # د) نبض "المتجهات في الجبر الخطي" (3.0 ث)
+    # "...والمتجهات في الجبر الخطي." [00:30.5 - 00:33.5]
+    scene.play(
+        sub_vectors.animate.scale(1.25),
+        vec_arrow.animate.scale(1.15),
+        run_time=0.8,
+    )
+    scene.play(
+        sub_vectors.animate.scale(1 / 1.25),
+        vec_arrow.animate.scale(1 / 1.15),
+        run_time=0.6,
+    )
+    scene.wait(1.6)
+
+    # هـ) التركيز على علامة الاستفهام وسؤال المتجه (8.0 ث)
+    # "فأقدر أستنتج من الجدول إنه لو سألنا إيه هو الشيء ده اللي اسمه المتجه واللي بيتعامل معاه علم الجبر الخطي..."
+    # [00:33.5 - 00:41.5]
+    scene.play(
+        question_badge.animate.scale(1.3),
+        title_linear.animate.scale(1.1),
+        run_time=1.0,
+    )
+    scene.play(
+        question_badge.animate.scale(1 / 1.3),
+        title_linear.animate.scale(1 / 1.1),
+        run_time=0.8,
+    )
+    scene.wait(6.2)
+
+    # و) وميض عمود الحساب (5.0 ث)
+    # "...كأني بسأل بالظبط إيه هو مفهوم العدد في علم الحساب؟..." [00:41.5 - 00:46.5]
+    scene.play(
+        title_arith.animate.set_color(GOLD_LIGHT).scale(1.12),
+        sub_numbers.animate.set_color(GOLD_LIGHT),
+        run_time=0.8,
+    )
+    scene.play(
+        title_arith.animate.set_color(COPPER_TERRA).scale(1 / 1.12),
+        sub_numbers.animate.set_color(IVORY_WHITE),
+        run_time=0.6,
+    )
+    scene.wait(3.6)
+
+    # ز) وميض عمود التفاضل والتكامل (6.0 ث)
+    # "...أو كأني بسأل إيه هو الشيء ده اللي اسمه دالة واللي إحنا بنتعامل معاها في التفاضل والتكامل؟!!"
+    # [00:46.5 - 00:52.5]
+    scene.play(
+        title_calc.animate.set_color(GOLD_LIGHT).scale(1.12),
+        sub_funcs.animate.set_color(GOLD_LIGHT),
+        run_time=0.8,
+    )
+    scene.play(
+        title_calc.animate.set_color(COPPER_TERRA).scale(1 / 1.12),
+        sub_funcs.animate.set_color(IVORY_WHITE),
+        run_time=0.6,
+    )
+    scene.wait(4.6)
+
+    # ح) هزة الأسئلة الثلاثة والتفريغ (5.5 ث)
+    # "وبصراحة الـ 3 أسئلة أصعب من بعض وإجابتهم مش سهلة إطلاقاً." [00:52.5 - 00:58.0]
+    scene.play(
+        Wiggle(question_badge, scale_value=1.15),
+        Wiggle(title_calc, scale_value=1.1),
+        Wiggle(title_arith, scale_value=1.1),
+        run_time=2.0,
+    )
+    scene.wait(1.5)
+
+    # تفريغ المشهد للانتقال للمشهد الثالث
     table.stop_shimmer()
     scene.play(
         FadeOut(table),
         FadeOut(all_content),
-        run_time=1.0,
+        run_time=1.2,
     )
-    scene.wait(0.5)
+    scene.wait(0.8)  # سكون للانتقال النظيف عند 00:58.0

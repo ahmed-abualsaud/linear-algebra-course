@@ -3,8 +3,6 @@ import numpy as np
 from common.palette import (
     GOLD_LIGHT,
     GOLD_BRIGHT,
-    GOLD_DARK,
-    GOLD_MUTED,
     STONE_AXIS,
     COPPER_TERRA,
     IVORY_WHITE,
@@ -171,8 +169,8 @@ def play_scene04(scene):
     X_CENTER =  0.0
     X_RIGHT  =  4.1
 
-    Y_ROW1 =  0.55   # الصف العلوي (الميزان - التفاحات - المسطرة)
-    Y_ROW2 = -1.35   # الصف السفلي (الساعة - المبنى - المنقلة)
+    Y_ROW1 =  0.55   # الصف العلوي
+    Y_ROW2 = -1.35   # الصف السفلي
 
     # 1. بطاقة الكميات الفيزيائية (اليسار)
     card_phys = MachCard(
@@ -226,20 +224,19 @@ def play_scene04(scene):
     )
 
     # ==============================================================
-    # 2. الصف العلوي (Row 1): ميزان بوزن 3.5kg - 4 تفاحات - مسطرة 3m
+    # 2. العناصر الداخلية للبطاقات مع رفع طبقتها للأمام (z_index=20)
     # ==============================================================
 
-    # أ) الميزان الحساس
+    # عناصر الفيزياء
     scale_icon = make_scale_with_weight(color=GOLD_LIGHT, scale=0.92)
     weight_text = MathTex(r"3.5\text{ kg}", tex_template=mach_math_template, font_size=27, color=IVORY_WHITE)
-    row_weight = VGroup(scale_icon, weight_text).arrange(RIGHT, buff=0.25).move_to([X_LEFT, Y_ROW1, 0])
+    row_weight = VGroup(scale_icon, weight_text).arrange(RIGHT, buff=0.25).move_to([X_LEFT, Y_ROW1, 0]).set_z_index(20)
 
-    # ب) الـ 4 تفاحات
-    apples_group = VGroup(*[make_apple(color=COPPER_TERRA, scale=0.88) for _ in range(4)]).arrange(RIGHT, buff=0.15)
-    apples_label = MarkupText("4 تفاحات", font="Cairo", font_size=19, color=IVORY_WHITE)
-    row_apples = VGroup(apples_group, apples_label).arrange(DOWN, buff=0.18).move_to([X_CENTER, Y_ROW1, 0])
+    clock_icon = make_realistic_clock(color=GOLD_LIGHT, scale=0.95)
+    time_text = MathTex(r"7\text{ min}", tex_template=mach_math_template, font_size=27, color=IVORY_WHITE)
+    row_time = VGroup(clock_icon, time_text).arrange(RIGHT, buff=0.28).move_to([X_LEFT, Y_ROW2, 0]).set_z_index(20)
 
-    # ج) مسطرة قياس هندسية مدرجة
+    # عناصر الهندسة
     ruler_len = 2.5
     measure_line = Line(LEFT * (ruler_len / 2), RIGHT * (ruler_len / 2), stroke_width=2.4, color=GOLD_LIGHT)
     cap_l = Line(UP * 0.14, DOWN * 0.14, stroke_width=2, color=GOLD_LIGHT).move_to(measure_line.get_left())
@@ -256,23 +253,8 @@ def play_scene04(scene):
 
     length_text = MathTex(r"3\text{ m}", tex_template=mach_math_template, font_size=26, color=IVORY_WHITE)\
         .next_to(measure_line, UP, buff=0.16)
-    row_length = VGroup(measure_line, cap_l, cap_r, ruler_ticks, length_text).move_to([X_RIGHT, Y_ROW1, 0])
+    row_length = VGroup(measure_line, cap_l, cap_r, ruler_ticks, length_text).move_to([X_RIGHT, Y_ROW1, 0]).set_z_index(20)
 
-    # ==============================================================
-    # 3. الصف السفلي (Row 2): الساعة 7s - المبنى - المنقلة الهندسية 180°
-    # ==============================================================
-
-    # أ) ساعة التوقيت الدقيقة
-    clock_icon = make_realistic_clock(color=GOLD_LIGHT, scale=0.95)
-    time_text = MathTex(r"7\text{ s}", tex_template=mach_math_template, font_size=27, color=IVORY_WHITE)
-    row_time = VGroup(clock_icon, time_text).arrange(RIGHT, buff=0.28).move_to([X_LEFT, Y_ROW2, 0])
-
-    # ب) المبنى المعماري
-    building_icon = make_building(color=COPPER_TERRA, scale=0.82)
-    floor_label = MarkupText("الدور العاشر", font="Cairo", font_size=19, color=IVORY_WHITE)
-    row_floor = VGroup(building_icon, floor_label).arrange(DOWN, buff=0.15).move_to([X_CENTER, Y_ROW2, 0])
-
-    # ج) المنقلة الهندسية المدرجة
     r_prot = 0.76
     angle_base = Line(LEFT * 1.25, RIGHT * 1.25, stroke_width=1.8, color=STONE_AXIS)
     angle_arc = Arc(radius=r_prot, start_angle=0, angle=PI, color=GOLD_LIGHT, stroke_width=2.2)
@@ -289,42 +271,59 @@ def play_scene04(scene):
 
     angle_text = MathTex(r"180^\circ", tex_template=mach_math_template, font_size=26, color=IVORY_WHITE)\
         .next_to(angle_arc.get_top(), UP, buff=0.14)
-    row_angle = VGroup(angle_base, angle_arc, angle_center_dot, prot_ticks, angle_text).move_to([X_RIGHT, Y_ROW2, 0])
+    row_angle = VGroup(angle_base, angle_arc, angle_center_dot, prot_ticks, angle_text).move_to([X_RIGHT, Y_ROW2, 0]).set_z_index(20)
+
+    # عناصر الأشياء المعدودة
+    apples_group = VGroup(*[make_apple(color=COPPER_TERRA, scale=0.88) for _ in range(4)]).arrange(RIGHT, buff=0.15)
+    apples_label = MarkupText("4 تفاحات", font="Cairo", font_size=19, color=IVORY_WHITE)
+    row_apples = VGroup(apples_group, apples_label).arrange(DOWN, buff=0.18).move_to([X_CENTER, Y_ROW1, 0]).set_z_index(20)
+
+    building_icon = make_building(color=COPPER_TERRA, scale=0.82)
+    floor_label = MarkupText("الدور العاشر", font="Cairo", font_size=19, color=IVORY_WHITE)
+    row_floor = VGroup(building_icon, floor_label).arrange(DOWN, buff=0.15).move_to([X_CENTER, Y_ROW2, 0]).set_z_index(20)
+
+    # تجميع كل كارت بمحتوياته لمنع تعارض الطبقات أثناء الأنيميشن
+    group_phys = VGroup(card_phys, row_weight, row_time)
+    group_geom = VGroup(card_geom, row_length, row_angle)
+    group_count = VGroup(card_count, row_apples, row_floor)
+
+    all_content = Group(group_phys, group_geom, group_count)
 
     # ==============================================================
-    # 4. التزامن الحركي والصوتي المحسوب للمشهد
+    # 3. التزامن الصوتي المحسوب (إجمالي المشهد: 46.0 ثانية)
+    # [01:12.0 -> 01:58.0 في التراك الصوتي]
     # ==============================================================
 
-    # أ) ظهور البطاقة الأولى (الفيزياء) عبر animate_shell
+    # أ) تمهيد الصورة الذهنية (11.0 ث)
+    # "طبعاً الصورة اللي انت متخيلها في ذهنك عن الأعداد قبل ما تسأله السؤال ده..."
+    # "...هي إننا بنستخدم الأعداد في المواقف اليومية للتعبير عن قيمة شيء معين" [01:12.0 - 01:23.0]
+    scene.wait(11.0)
+
+    # ب) بطاقة الكميات الفيزيائية (11.0 ث)
+    # "يعني مثلاً احنا بنستخدم الأرقام أو الأعداد للتعبير عن كميات فيزيائية..." [01:23.0 - 01:34.0]
     scene.play(
         card_phys.animate_shell(run_time=0.8),
     )
+    # "...زي إن أقول مثلاً اشتريت 3.5 كيلو فاكهة..."
     scene.play(
-        FadeIn(row_weight, shift=RIGHT * 0.2),
-        run_time=0.7,
-    )
-    scene.play(
-        FadeIn(row_time, shift=RIGHT * 0.2),
-        run_time=0.7,
-    )
-
-    # ب) ظهور البطاقة الثانية (أشياء معدودة)
-    scene.play(
-        card_count.animate_shell(run_time=0.8),
-    )
-    scene.play(
-        FadeIn(row_apples, shift=UP * 0.15),
+        FadeIn(row_weight, shift=UP * 0.15),
         run_time=0.8,
     )
-    scene.play(
-        FadeIn(row_floor, shift=UP * 0.15),
-        run_time=0.7,
-    )
+    scene.wait(2.2)
 
-    # ج) ظهور البطاقة الثالثة (كميات هندسية)
+    # "...أو عدى 7 دقايق على ميعاد القطر"
+    scene.play(
+        FadeIn(row_time, shift=UP * 0.15),
+        run_time=0.8,
+    )
+    scene.wait(6.4)
+
+    # ج) بطاقة الكميات الهندسية (8.5 ث)
+    # "أو بنستخدمها للتعبير عن كميات هندسية..." [01:34.0 - 01:42.5]
     scene.play(
         card_geom.animate_shell(run_time=0.8),
     )
+    # "...زي إن أقول مثلاً خط طوله 3 متر..."
     scene.play(
         Create(measure_line),
         FadeIn(cap_l, cap_r),
@@ -332,27 +331,58 @@ def play_scene04(scene):
         FadeIn(length_text),
         run_time=0.9,
     )
+    scene.wait(1.3)
+
+    # "...أو زاوية قياسها 180 درجة"
     scene.play(
         Create(angle_base),
         Create(angle_arc),
         Create(prot_ticks),
         FadeIn(angle_center_dot),
         FadeIn(angle_text),
-        run_time=0.9,
+        run_time=1.0,
     )
+    scene.wait(4.5)
 
-    # د) استقرار المشهد للتأمل (3.5s)
-    scene.wait(3.5)
-
-    # هـ) تفريغ المشهد بالكامل
-    all_content = Group(
-        card_phys, row_weight, row_time,
-        card_count, row_apples, row_floor,
-        card_geom, row_length, row_angle,
+    # د) بطاقة الأشياء المعدودة (8.0 ث)
+    # "أو حتى استخدمها للتعبير عن أشياء معدودة..." [01:42.5 - 01:50.5]
+    scene.play(
+        card_count.animate_shell(run_time=0.8),
     )
+    # "...زي إن أقول معايا 4 تفاحات مثلاً..."
+    scene.play(
+        FadeIn(row_apples, shift=UP * 0.15),
+        run_time=0.8,
+    )
+    scene.wait(1.5)
 
+    # "...أو إني طلعت مثلاً الدور العاشر وهكذا"
+    scene.play(
+        FadeIn(row_floor, shift=UP * 0.15),
+        run_time=0.8,
+    )
+    scene.wait(4.1)
+
+    # هـ) التلخيص والتفريغ النهائي (7.5 ث)
+    # الكروت تنبض مع محتوياتها كوحدة واحدة بدون أي بهتان
+    # "كل اللي حكيته ده مواقف وأمثلة بنستخدم فيها الأرقام للتعبير عن قيمة رياضية معينة" [01:50.5 - 01:58.0]
+    scene.play(
+        group_phys.animate.scale(1.03),
+        group_geom.animate.scale(1.03),
+        group_count.animate.scale(1.03),
+        run_time=1.0,
+    )
+    scene.play(
+        group_phys.animate.scale(1 / 1.03),
+        group_geom.animate.scale(1 / 1.03),
+        group_count.animate.scale(1 / 1.03),
+        run_time=0.8,
+    )
+    scene.wait(3.7)
+
+    # تفريغ المشهد بالكامل
     scene.play(
         FadeOut(all_content),
-        run_time=0.9,
+        run_time=1.2,
     )
-    scene.wait(0.5)
+    scene.wait(0.8)  # سكون الانتقال النظيف للمشهد الخامس عند 01:58.0

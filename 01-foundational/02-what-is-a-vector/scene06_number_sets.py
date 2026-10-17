@@ -3,8 +3,6 @@ import numpy as np
 from common.palette import (
     GOLD_LIGHT,
     GOLD_BRIGHT,
-    GOLD_DARK,
-    GOLD_MUTED,
     STONE_AXIS,
     COPPER_TERRA,
     IVORY_WHITE,
@@ -106,7 +104,7 @@ def play_scene06(scene):
     # 2. الكائنات الهندسية في النصف الأيسر من الشاشة
     # ==============================================================
 
-    # ----------------- 1. الأعداد الصحيحة Z (في الجزء العلوي Y = 2.30) -----------------
+    # ----------------- 1. الأعداد الصحيحة Z (Y = 2.30) -----------------
     y_integers = 2.30
     discrete_line = DashedLine(
         start=[CENTER_LEFT_X - 2.5, y_integers, 0],
@@ -141,7 +139,7 @@ def play_scene06(scene):
 
     group_integers_geom = VGroup(discrete_line, arrow_int_l, arrow_int_r, int_dots_group, int_labels_group)
 
-    # ----------------- 2. خط الأعداد الحقيقية R (في المنتصف Y = 0.40) -----------------
+    # ----------------- 2. خط الأعداد الحقيقية R (Y = 0.40) -----------------
     y_real = 0.40
     real_line = MachNumberLine(
         length=5.6,
@@ -150,7 +148,7 @@ def play_scene06(scene):
         font_size=18,
     ).move_to([CENTER_LEFT_X, y_real, 0])
 
-    # ----------------- 3. شبكة الأعداد المركبة C (في الأسفل Y = -1.95) بستايل MachAxes الرسمي -----------------
+    # ----------------- 3. شبكة الأعداد المركبة C (Y = -1.95) -----------------
     y_complex = -1.95
     complex_axes = MachAxes(
         x_range=[-2, 2, 1],
@@ -170,7 +168,7 @@ def play_scene06(scene):
     group_complex_geom = VGroup(complex_axes, label_re, label_im)
 
     # ==============================================================
-    # 3. شريط القواعد والقوانين الصارمة (ترتيب عربي: النص يميناً والعمليات يساراً)
+    # 3. شريط القواعد والقوانين الصارمة
     # ==============================================================
     rules_card = RoundedRectangle(
         corner_radius=0.18,
@@ -190,35 +188,49 @@ def play_scene06(scene):
         color=GOLD_BRIGHT,
     )
     
-    # الترتيب بـ LEFT يجعل النص العربي على اليمين والعمليات الحسابية على يساره
     rules_content = VGroup(rules_label, rules_ops).arrange(LEFT, buff=0.35).move_to(rules_card.get_center())
     rules_group = VGroup(rules_card, rules_content)
 
+    all_scene = Group(
+        group_c, group_r, group_z,
+        real_line, group_integers_geom, group_complex_geom,
+        rules_group
+    )
+
     # ==============================================================
-    # 4. التزامن الصوتي المحسوب للمشهد السادس
+    # 4. التزامن الصوتي المحسوب (إجمالي المشهد: 44.0 ثانية كاملة)
+    # [02:35.0 -> 03:19.0 في الفيديو | 02:28.0 -> 03:12.0 في الصوت]
     # ==============================================================
 
-    # أ) ظهور مجموعة الأعداد الحقيقية R يميناً + خط الأعداد الحقيقية يساراً
+    # أ) مجموعة الأعداد الحقيقية R يميناً + خط الأعداد الحقيقية يساراً (7.0 ث)
+    # "والعالم اللي بيعيش فيه الأرقام اللي معظمنا يعرفها اسمه مجموعة الأعداد الحقيقية..." [02:28.0 - 02:35.0]
     scene.play(
         Create(circle_r),
         FadeIn(badge_r),
         FadeIn(sample_r),
         Create(real_line),
-        run_time=1.4,
+        run_time=1.5,
     )
-    scene.wait(1.5)
+    scene.wait(5.5)
 
-    # ب) ظهور مجموعة الأعداد الصحيحة Z يميناً + نقاط الأعداد الصحيحة والسهمين يساراً
+    # ب) مجموعة الأعداد الصحيحة Z يميناً + نقاط الأعداد الصحيحة يساراً (8.0 ث)
+    # "في عوالم تانية أصغر بتحتوي على الأعداد الصحيحة بس زي صفر أو واحد أو تلاتة أو سالب عشرة..." [02:35.0 - 02:43.0]
     scene.play(
         Create(circle_z),
         FadeIn(badge_z),
         FadeIn(sample_z),
         FadeIn(group_integers_geom, shift=DOWN * 0.15),
-        run_time=1.2,
+        run_time=1.4,
     )
-    scene.wait(1.6)
+    scene.play(
+        sample_z.animate.scale(1.2).set_color(GOLD_BRIGHT),
+        rate_func=there_and_back,
+        run_time=1.0,
+    )
+    scene.wait(5.6)
 
-    # ج) ظهور مجموعة الأعداد المركبة C يميناً + شبكة الأعداد المركبة الرسمية يساراً
+    # ج) مجموعة الأعداد المركبة C يميناً + شبكة الأعداد المركبة يساراً (5.0 ث)
+    # "وفي عوالم تانية أكبر زي مجموعة الأعداد المركبة..." [02:43.0 - 02:48.0]
     scene.play(
         Create(circle_c),
         FadeIn(badge_c),
@@ -226,31 +238,41 @@ def play_scene06(scene):
         FadeIn(group_complex_geom, scale=0.92),
         run_time=1.4,
     )
-    scene.wait(1.8)
+    scene.wait(3.6)
 
-    # د) ظهور القوانين والقواعد الصارمة مع وميض ذهبي
+    # د) ظهور القواعد والقوانين الصارمة للعمليات الحسابية (8.5 ث)
+    # "والعوالم الرياضية الخاصة بالأعداد دي تخضع لقواعد وقوانين صارمة زي قاعدة الجمع والطرح والضرب والقسمة..." [02:48.0 - 02:56.5]
     scene.play(
         FadeIn(rules_group, shift=UP * 0.25),
-        run_time=0.9,
+        run_time=1.0,
     )
     scene.play(
-        rules_ops.animate.scale(1.15).set_color(GOLD_BRIGHT),
+        rules_ops.animate.scale(1.2).set_color(GOLD_BRIGHT),
         rate_func=there_and_back,
+        run_time=1.2,
+    )
+    scene.wait(6.3)
+
+    # هـ) تأمل الصورة الذهنية المسبقة والتفريغ النهائي (15.5 ث كاملة)
+    # "لكن زي ما قولت إحنا كبشر عندنا صورة ذهنية مسبقة عن الأعداد..." [02:56.5 - 03:02.0]
+    scene.play(
+        real_line.animate.scale(1.03),
+        rules_card.animate.scale(1.03),
+        run_time=1.0,
+    )
+    scene.play(
+        real_line.animate.scale(1 / 1.03),
+        rules_card.animate.scale(1 / 1.03),
         run_time=0.8,
     )
-    scene.wait(3.2)
 
-    # ==============================================================
-    # 5. تفريغ المشهد للانتقال للمشهد السابع
-    # ==============================================================
-    all_scene = Group(
-        group_c, group_r, group_z,
-        real_line, group_integers_geom, group_complex_geom,
-        rules_group
-    )
+    # "...وفي الصورة الذهنية دي هتلاقي الأعداد مرتبطة بأمثلة ومواقف وسياقات معينة للتعبير عنها وفهمها" [03:02.0 - 03:10.0]
+    scene.wait(10.7)  # إعطاء الوقت الكافي لانتهاء جملة الفهم والسياقات
 
+    # تفريغ المشهد بالكامل
     scene.play(
         FadeOut(all_scene),
-        run_time=0.9,
+        run_time=1.2,
     )
-    scene.wait(0.5)
+    # سكون الانتقال النظيف ليسلّم الشاشة عند 03:19.0 بالضبط
+    scene.wait(1.8)

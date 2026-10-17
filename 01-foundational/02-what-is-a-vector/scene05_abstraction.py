@@ -3,7 +3,6 @@ import numpy as np
 from common.palette import (
     GOLD_LIGHT,
     GOLD_BRIGHT,
-    GOLD_DARK,
     GOLD_MUTED,
     STONE_AXIS,
     COPPER_TERRA,
@@ -17,7 +16,8 @@ from common.latex import mach_math_template
 def play_scene05(scene):
 
     # ==============================================================
-    # 1. المرحلة الأولى: إشعال فريم النيون وتفكيك المعنى المادي داخل الفريم الداخلي
+    # 1. المرحلة الأولى: إشعال فريم النيون وتفكيك المعنى المادي (12.4 ث)
+    # [02:04.0 -> 02:16.4 في الفيديو | 01:58.0 -> 02:09.4 في الصوت]
     # ==============================================================
     X_GAP = 1.95
     Y_ROW = 0.65
@@ -52,16 +52,18 @@ def play_scene05(scene):
 
     abstract_numbers = VGroup(num_weight, num_apples, num_length, num_time, num_floor, num_angle)
 
-    # أ) إشعال فريم النيون وظهور العناصر
-    turn_on_neon(scene, run_time=0.9)
+    # أ) إشعال فريم النيون وظهور العناصر مع بداية جملة:
+    # "لكن إجابة عالم الرياضيات..."
+    turn_on_neon(scene, run_time=0.8)
 
     scene.play(
         LaggedStart(*[FadeIn(it, shift=UP * 0.15) for it in all_items], lag_ratio=0.08),
         run_time=0.8,
     )
-    scene.wait(1.4)
+    # استماع أثناء "...هتبينلك إن العدد نفسه لا يمثل أي شيء من ده إطلاقاً..."
+    scene.wait(2.8)
 
-    # خطوط الشطب
+    # ب) خطوط الشطب على الوحدات مع جملة "...لا يمثل أي شيء من ده إطلاقاً"
     slash_lines = VGroup(*[
         Line(
             it.get_center() + LEFT * 0.42 + DOWN * 0.18,
@@ -71,23 +73,27 @@ def play_scene05(scene):
         for it in all_items
     ])
 
-    scene.play(Create(slash_lines), run_time=0.7)
-    scene.wait(0.5)
+    scene.play(Create(slash_lines), run_time=0.8)
+    
+    # "...كل دي عبارة عن أمثلة ومواقف بنستخدم فيها الأعداد"
+    scene.wait(2.2)
 
-    # ب) تلاشي الوحدات وبقاء الأرقام المجردة
+    # ج) تلاشي الوحدات وبقاء الأرقام الذهبية المجردة الصافية
     scene.play(
         FadeOut(VGroup(*all_items)),
         FadeOut(slash_lines),
         FadeIn(abstract_numbers, scale=1.05),
-        run_time=0.9,
+        run_time=0.8,
     )
-    scene.wait(1.2)
+    # ثبات الأرقام الذهبية المجردة ليراها المشاهد بوضوح
+    scene.wait(3.4)
 
     # إطفاء فريم النيون بهدوء
     turn_off_neon(scene, run_time=0.8)
 
     # ==============================================================
-    # 2. المرحلة الثانية: ظهور عالم الرياضيات وكارت التجريد
+    # 2. المرحلة الثانية: ظهور عالم الرياضيات وكارت التجريد وخط الأعداد (8.4 ث)
+    # [02:16.4 -> 02:24.8 في الفيديو | 02:09.4 -> 02:17.8 في الصوت]
     # ==============================================================
     mathematician = mach_mathematician(
         color=COPPER_TERRA,
@@ -110,9 +116,7 @@ def play_scene05(scene):
     badge_content = VGroup(t_main, t_sub).arrange(DOWN, buff=0.16).move_to(card_bg.get_center())
     abstract_badge = VGroup(card_bg, badge_content).move_to([0.8, 1.9, 0])
 
-    # ==============================================================
-    # 3. خط الأعداد الرسمي وحركة الأرقام المتزامنة (منع التداخل)
-    # ==============================================================
+    # خط الأعداد الرسمي
     number_line = NumberLine(
         x_range=[0, 11, 1],
         length=7.0,
@@ -148,7 +152,7 @@ def play_scene05(scene):
 
     numline_group = VGroup(number_line, ext_l, ext_r, tip_l, tip_r)
 
-    # المواضع النهائية الدقيقة على خط الأعداد
+    # المواضع على خط الأعداد
     p_3   = number_line.n2p(3)   + UP * 0.40
     p_4   = number_line.n2p(4)   + UP * 0.40
     p_7   = number_line.n2p(7)   + UP * 0.40
@@ -172,8 +176,7 @@ def play_scene05(scene):
     ellipsis_text = MathTex(r"\dots", font_size=28, color=GOLD_LIGHT)\
         .move_to(p_line_end + RIGHT * 0.35 + UP * 0.38)
 
-    # ---------------- حركة التزامن الذكية ----------------
-    # 1) مغادرة الأرقام الذهبية لمواقعها القديمة بالتوازي مع تشييد خط الأعداد
+    # "لكن العدد بالنسبة لعالم الرياضيات هو إنه عبارة عن فكرة..."
     scene.play(
         FadeIn(mathematician, shift=RIGHT * 0.3),
         FadeIn(abstract_badge, shift=UP * 0.2),
@@ -188,16 +191,18 @@ def play_scene05(scene):
         rate_func=smooth,
     )
 
-    # 2) اشتعال نقاط الإضاءة الذهبية والخط الإرشادي فور استقرار الأرقام
+    # اشتعال النقاط الذهبية
     scene.play(
         FadeIn(dots_on_line),
         FadeIn(guide_line_3_5),
         FadeIn(ellipsis_text),
         run_time=0.6,
     )
-    scene.wait(2.5)
 
-    # تفريغ الخط ومكوناته
+    # استماع وتأمل أثناء "...أو مفهوم مجرد من أي مثال أو موقف"
+    scene.wait(4.6)
+
+    # تفريغ خط الأعداد وكارت التجريد (عالم الرياضيات يبقى في المشهد)
     scene.play(
         FadeOut(abstract_badge),
         FadeOut(numline_group),
@@ -207,9 +212,11 @@ def play_scene05(scene):
         FadeOut(ellipsis_text),
         run_time=0.8,
     )
+    scene.wait(0.6)
 
     # ==============================================================
-    # 4. المرحلة الثالثة: البوابة الكونية للأعداد (عالم الأعداد)
+    # 3. المرحلة الثالثة: البوابة الكونية للأعداد (عالم الأعداد) (10.2 ث)
+    # [02:24.8 -> 02:35.0 في الفيديو | 02:17.8 -> 02:28.0 في الصوت]
     # ==============================================================
     portal_center = np.array([1.6, 0.0, 0])
 
@@ -241,6 +248,8 @@ def play_scene05(scene):
 
     realm_group = VGroup(realm_glow, realm_ring_outer, realm_ring_dash, realm_title, floating_nums)
 
+    # ظهور بوابة عالم الأعداد مع جملة:
+    # "وإن الأرقام أو الأعداد دي هي جزء من عالم بتعيش فيه وبيحتويها..."
     scene.play(
         FadeIn(realm_glow),
         Create(realm_ring_outer),
@@ -250,18 +259,22 @@ def play_scene05(scene):
         run_time=1.4,
     )
 
+    # دوران فلكي هادئ للأرقام أثناء جملة:
+    # "...زي ما احنا كبشر جزء من الكون وعايشين فيه بالظبط."
     scene.play(
-        Rotate(floating_nums, angle=0.08 * TAU, about_point=portal_center, rate_func=linear),
-        run_time=4.5,
+        Rotate(floating_nums, angle=0.10 * TAU, about_point=portal_center, rate_func=linear),
+        run_time=6.4,
     )
 
     # ==============================================================
-    # 5. تفريغ المشهد للانتقال للمشهد السادس
+    # 4. تفريغ المشهد للانتقال للمشهد السادس (2.4 ث)
+    # [02:32.6 -> 02:35.0 في الفيديو]
     # ==============================================================
     all_scene = Group(mathematician, realm_group)
 
     scene.play(
         FadeOut(all_scene),
-        run_time=0.9,
+        run_time=1.2,
     )
-    scene.wait(0.5)
+    # سكون الانتقال النظيف ليسلّم المشهد بدقة عند 02:35.0
+    scene.wait(1.2)
