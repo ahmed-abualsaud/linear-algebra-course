@@ -327,30 +327,72 @@ def mach_stick_figure(color=STONE_AXIS, accent_color=GOLD_LIGHT, pose="neutral",
     return MachAvatar(color=color, accent_color=accent_color, pose=pose, size=scale, **kwargs)
 
 
-def mach_mathematician(color=COPPER_TERRA, accent_color=GOLD_LIGHT, pose="thinking", scale=1.0, glasses=True, tie_type="bowtie", **kwargs):
+def _add_glasses(avatar, accent):
+    """نظارة مستطيلة بحواف ناعمة: عدستان واسعتان، جسر واضح، وأذرع توصل لحافة الوجه."""
+    shell = avatar.head[1]
+    cx, cy = shell.get_center()[:2]
+    k = shell.width / 0.788                    # نسبة التكبير الحالية للشخصية
+    ey = cy + 0.03 * k                         # مستوى العينين قبل أي ميلان للرأس
+    r = 0.108 * k
+    dx = 0.140 * k
+    lw = 2.6
+    lens_l = RoundedRectangle(
+        corner_radius=r * 0.42, width=2 * r * 1.12, height=2 * r * 0.88,
+        stroke_width=lw, color=accent, stroke_opacity=0.98,
+        fill_color=DARK, fill_opacity=0.18,
+    ).move_to([cx - dx, ey, 0])
+    lens_r = lens_l.copy().move_to([cx + dx, ey, 0])
+    bridge = Line([cx - dx + r * 1.12, ey + 0.012 * k, 0], [cx + dx - r * 1.12, ey + 0.012 * k, 0],
+                  stroke_width=lw, color=accent, stroke_opacity=0.95)
+    edge = shell.width / 2 - 0.012 * k
+    temple_l = Line([cx - dx - r * 1.12, ey + 0.006 * k, 0], [cx - edge, ey + 0.016 * k, 0],
+                    stroke_width=lw * 0.8, color=accent, stroke_opacity=0.85)
+    temple_r = Line([cx + dx + r * 1.12, ey + 0.006 * k, 0], [cx + edge, ey + 0.016 * k, 0],
+                    stroke_width=lw * 0.8, color=accent, stroke_opacity=0.85)
+    frame = VGroup(lens_l, lens_r, bridge, temple_l, temple_r)
+    v = avatar.eyes[1].get_center() - avatar.eyes[0].get_center()
+    tilt = float(np.arctan2(v[1], v[0]))       # لو الرأس مايل (pose=thinking) النظارة تميل معه
+    if abs(tilt) > 1e-4:
+        frame.rotate(tilt, about_point=shell.get_center())
+    avatar.head.add(frame)
+
+
+def _add_necktie(avatar, color, accent):
+    """كرافات: عقدة + نصل متسع بنهاية مدببة + لمعة + خطوط قطرية + هالة.
+    بتتحط خلف نقطة الصدر (core) فتبان كأنها دبوس الكرافات."""
+    k = avatar.head[1].width / 0.788
+    nb = avatar[1].get_end()                   # أسفل الرقبة
+    P = lambda x, y: np.array([nb[0] + x * k, nb[1] + y * k, 0.0])
+    deep = "#8E3417"
+    blade_pts = [(-0.030, -0.095), (0.030, -0.095), (0.088, -0.50), (0.0, -0.62), (-0.088, -0.50)]
+    halo = Polygon(*[P(x * 1.35, y * 1.04) for x, y in blade_pts], stroke_width=0,
+                   fill_color=color, fill_opacity=0.16)
+    blade = Polygon(*[P(x, y) for x, y in blade_pts], stroke_width=1.6, stroke_color=accent,
+                    stroke_opacity=0.9, fill_color=deep, fill_opacity=1.0)
+    blade.round_corners(0.012 * k)
+    shine = Polygon(P(-0.030, -0.10), P(-0.004, -0.10), P(-0.002, -0.58), P(-0.075, -0.49),
+                    stroke_width=0, fill_color=color, fill_opacity=0.55)
+    stripes = VGroup()
+    for y in np.arange(-0.19, -0.50, 0.075):
+        w = (0.030 + (0.088 - 0.030) * min(1.0, (-y - 0.095) / 0.405)) * 0.82
+        stripes.add(Line(P(-w, y + 0.035), P(w, y - 0.035), stroke_width=1.5,
+                         color=accent, stroke_opacity=0.65))
+    knot = RoundedRectangle(corner_radius=0.02 * k, width=0.085 * k, height=0.075 * k,
+                            stroke_width=1.6, stroke_color=accent, stroke_opacity=0.95,
+                            fill_color=color, fill_opacity=1.0).move_to(P(0, -0.055))
+    knot_hi = Line(P(-0.02, -0.045), P(0.02, -0.045), stroke_width=1.2, color=GOLD_BRIGHT, stroke_opacity=0.8)
+    tie = VGroup(halo, blade, shine, stripes, knot, knot_hi)
+    avatar.submobjects.insert(4, tie)          # خلف core (الترتيب: head, neck, torso, torso_rim, [tie], core, ...)
+
+
+def mach_mathematician(color=COPPER_TERRA, accent_color=GOLD_LIGHT, pose="thinking", scale=1.0, glasses=True, tie_type="necktie", **kwargs):
     avatar = MachAvatar(color=color, accent_color=accent_color, pose=pose, size=scale, **kwargs)
 
     if glasses:
-        center_l = avatar.eyes[0].get_center()
-        center_r = avatar.eyes[1].get_center()
-        r_lens = 0.082
+        _add_glasses(avatar, accent_color)
 
-        glass_l = Circle(radius=r_lens, stroke_width=1.7, color=accent_color, stroke_opacity=0.95, fill_color=DARK, fill_opacity=0.25).move_to(center_l)
-        glass_r = Circle(radius=r_lens, stroke_width=1.7, color=accent_color, stroke_opacity=0.95, fill_color=DARK, fill_opacity=0.25).move_to(center_r)
-
-        unit_vec = (center_r - center_l) / np.linalg.norm(center_r - center_l)
-        bridge = Line(center_l + unit_vec * r_lens, center_r - unit_vec * r_lens, stroke_width=1.6, color=accent_color, stroke_opacity=0.9)
-        temple_l = Line(center_l - unit_vec * r_lens, center_l - unit_vec * (r_lens + 0.14), stroke_width=1.6, color=accent_color, stroke_opacity=0.75)
-        temple_r = Line(center_r + unit_vec * r_lens, center_r + unit_vec * (r_lens + 0.14), stroke_width=1.6, color=accent_color, stroke_opacity=0.75)
-
-        avatar.head.add(VGroup(glass_l, glass_r, bridge, temple_l, temple_r))
-
-    if tie_type:
-        neck_bottom = avatar[1].get_end()
-        if tie_type == "bowtie":
-            knot = Dot(point=neck_bottom + DOWN * 0.04, radius=0.032, color=accent_color)
-            wing_l = Polygon(knot.get_center(), knot.get_center() + LEFT * 0.14 + UP * 0.065, knot.get_center() + LEFT * 0.14 + DOWN * 0.065, color=color, stroke_width=1.4, fill_color=DARK, fill_opacity=1.0)
-            wing_r = Polygon(knot.get_center(), knot.get_center() + RIGHT * 0.14 + UP * 0.065, knot.get_center() + RIGHT * 0.14 + DOWN * 0.065, color=color, stroke_width=1.4, fill_color=DARK, fill_opacity=1.0)
-            avatar.add(VGroup(wing_l, wing_r, knot))
+    # "bowtie" القديمة بقت بتطلع كرافات، علشان كل المشاهد القديمة تتحدّث تلقائيًا
+    if tie_type in ("necktie", "bowtie"):
+        _add_necktie(avatar, color, accent_color)
 
     return avatar
