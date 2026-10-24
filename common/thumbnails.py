@@ -153,8 +153,15 @@ def title_block(line1, line2, badge_text, cx=TITLE_CX, line1_width=2.4, line2_wi
 
 def mathematician_with_glow(pos=CHAR_POS, scale=CHAR_SCALE, pose="explaining", **kwargs):
     """شخصية القناة + هالة نحاسية خلفها. ترجع (glow, character)."""
-    opts = dict(color=COPPER_TERRA, accent_color=GOLD_LIGHT, pose=pose, scale=scale,
-                blink=False, breathing=False, glasses=True, tie_type="bowtie")
+    opts = dict(
+        color=COPPER_TERRA,
+        accent_color=GOLD_LIGHT,
+        pose=pose,
+        scale=scale,
+        blink=False,
+        breathing=False,
+        glasses=True,
+        tie_type="necktie")
     opts.update(kwargs)
     char = mach_mathematician(**opts).move_to(pos)
     glow = soft_glow(np.array(pos) + np.array([0.2, 0.2, 0]), 3.4, COPPER_TERRA, layers=14, peak=0.045)
