@@ -11,11 +11,11 @@ from scene04_abstract_concept import play_scene04
 from scene05_list_of_numbers import play_scene05
 from scene06_dimension_limit import play_scene06
 from scene07_feature_engineering import play_scene07
-from scene08_09_10_helicopter import play_scene08
-from scene08_09_10_helicopter import play_scene09
-from scene08_09_10_helicopter import play_scene10
-from scene11_12_helicopter import play_scene11
-from scene11_12_helicopter import play_scene12
+from scene08_helicopter import play_scene08
+from scene09_helicopter import play_scene09
+from scene10_helicopter import play_scene10
+from scene11_helicopter import play_scene11
+from scene12_helicopter import play_scene12
 from scene13_conclusion import play_scene13
 
 
