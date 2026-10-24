@@ -1,7 +1,7 @@
 from manim import *
 import numpy as np
 
-from common import (
+from episode_03_common import (
     MOVE, DURATION, FLIGHT_TIME, UNIT, AXES_CENTER,
     SPACE_COLOR, TIME_COLOR, GOLD_LIGHT, GOLD_BRIGHT, COPPER_TERRA, IVORY_WHITE,
     MachAxes3D, make_helicopter, fly_along_3d, MachTimeSlider,

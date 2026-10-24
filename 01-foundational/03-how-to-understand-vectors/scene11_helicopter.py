@@ -1,6 +1,6 @@
 from manim import *
 
-from common import (
+from episode_03_common import (
     M_COLOR, CM_COLOR, PLANK_COLOR, GOLD_LIGHT, TIME_COLOR,
     _clear, _hud, _ar, _make_list, _path_flash, _exit_all
 )

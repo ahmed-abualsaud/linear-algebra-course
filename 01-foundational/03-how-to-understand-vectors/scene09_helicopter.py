@@ -1,7 +1,7 @@
 from manim import *
 import numpy as np
 
-from common import (
+from episode_03_common import (
     MOVE, DURATION, SCALE,
     GOLD_LIGHT, GOLD_BRIGHT, COPPER_TERRA, IVORY_WHITE, SPACE_COLOR, TIME_COLOR,
     _clear, _hud, _ar, _TickLabels
