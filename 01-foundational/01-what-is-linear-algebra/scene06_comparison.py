@@ -242,3 +242,7 @@ def play_scene06(scene):
     scene.wait(1.0)
 
     # إجمالي زمن المشهد السادس: 30.0 ثانية بالتمام والكمال!
+
+class Dev(ThreeDScene):
+    def construct(self):
+        play_scene06(self)

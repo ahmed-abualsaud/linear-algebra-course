@@ -102,3 +102,7 @@ def play_scene05(scene):
 
     # الحسبة الإجمالية للمشهد الخامس:
     # 0.8 + 1.0 + 36.4 + 0.8 + 1.0 = 40.0 ثانية بالتمام والكمال!
+
+class Dev(ThreeDScene):
+    def construct(self):
+        play_scene05(self)

@@ -121,3 +121,8 @@ def play_scene01(scene):
 
     # الحسبة الإجمالية للمشهد الأول:
     # 1.0 + 1.2 + 0.2 + 1.8 + 0.3 + 0.5 + 22.2 + 0.9 + 0.9 + 1.0 = 30.0 ثانية بالتمام والكمال!
+
+
+class Dev(ThreeDScene):
+    def construct(self):
+        play_scene01(self)
