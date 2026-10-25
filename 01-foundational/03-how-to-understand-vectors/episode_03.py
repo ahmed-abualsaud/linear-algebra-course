@@ -19,7 +19,7 @@ from scene12_helicopter import play_scene12
 from scene13_conclusion import play_scene13
 
 
-class FullEpisode03(ThreeDScene):
+class Episode03(ThreeDScene):
     def construct(self):
         # ---------------- SECTION 1: INTRO ----------------
         self.next_section("01_intro")

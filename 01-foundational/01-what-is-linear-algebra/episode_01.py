@@ -13,7 +13,7 @@ from scene06_comparison import play_scene06
 from scene07_master_table import play_scene07
 
 
-class FullEpisode01(Scene):
+class Episode01(Scene):
     def construct(self):
         # ---------------- SECTION 1: INTRO ----------------
         self.next_section("01_intro")

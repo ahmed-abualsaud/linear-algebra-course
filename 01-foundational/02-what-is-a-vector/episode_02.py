@@ -15,7 +15,7 @@ from scene08_core_operations import play_scene08
 from scene09_teacher_analogy import play_scene09
 
 
-class FullEpisode02(Scene):
+class Episode02(Scene):
     def construct(self):
         # ---------------- SECTION 1: INTRO ----------------
         self.next_section("01_intro")
