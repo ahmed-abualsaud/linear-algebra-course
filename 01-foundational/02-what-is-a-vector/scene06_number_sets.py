@@ -276,3 +276,8 @@ def play_scene06(scene):
     )
     # سكون الانتقال النظيف ليسلّم الشاشة عند 03:19.0 بالضبط
     scene.wait(1.8)
+
+
+class Dev(ThreeDScene):
+    def construct(self):
+        play_scene06(self)

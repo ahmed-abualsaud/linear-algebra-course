@@ -278,3 +278,8 @@ def play_scene05(scene):
     )
     # سكون الانتقال النظيف ليسلّم المشهد بدقة عند 02:35.0
     scene.wait(1.2)
+
+
+class Dev(ThreeDScene):
+    def construct(self):
+        play_scene05(self)

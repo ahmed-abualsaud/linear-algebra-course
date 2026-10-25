@@ -152,3 +152,8 @@ def play_scene01(scene):
 
     # فاصل سكون طبيعي قبل بدء رسم الجدول في المشهد الثاني
     scene.wait(0.1)
+
+
+class Dev(ThreeDScene):
+    def construct(self):
+        play_scene01(self)

@@ -293,3 +293,8 @@ def play_scene07(scene):
         run_time=1.2,
     )
     scene.wait(0.8)  # سكون الانتقال النظيف للمشهد الثامن عند 03:52.0
+
+
+class Dev(ThreeDScene):
+    def construct(self):
+        play_scene07(self)

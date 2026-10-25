@@ -307,3 +307,8 @@ def play_scene02(scene):
         run_time=1.2,
     )
     scene.wait(0.8)  # سكون للانتقال النظيف عند 00:58.0
+
+
+class Dev(ThreeDScene):
+    def construct(self):
+        play_scene02(self)

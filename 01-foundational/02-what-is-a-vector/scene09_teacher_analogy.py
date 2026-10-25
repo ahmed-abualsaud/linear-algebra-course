@@ -271,3 +271,8 @@ def play_scene09(scene):
         run_time=1.2,
     )
     scene.wait(0.8)  # سكون تام عند 05:08.0 لتسليم الشاشة لكليب الأوترو
+
+
+class Dev(ThreeDScene):
+    def construct(self):
+        play_scene09(self)

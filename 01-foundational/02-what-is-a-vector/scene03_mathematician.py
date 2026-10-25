@@ -128,3 +128,8 @@ def play_scene03(scene):
 
     # فاصل شاشة سوداء نظيف قبل انطلاق بطاقات المشهد الرابع عند 01:12.0
     scene.wait(0.6)
+
+
+class Dev(ThreeDScene):
+    def construct(self):
+        play_scene03(self)
