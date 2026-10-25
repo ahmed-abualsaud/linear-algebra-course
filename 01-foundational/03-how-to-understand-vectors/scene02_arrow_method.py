@@ -375,3 +375,8 @@ def play_scene02(scene):
     scene.wait(0.8)
 
     # الحسبة الدقيقة: 3.0 + 2.0 + 2.0 + 2.5 + 7.0 + 1.5 + 2.0 = 20.0 ثانية بالمللي!
+
+
+class Dev(ThreeDScene):
+    def construct(self):
+        play_scene02(self)

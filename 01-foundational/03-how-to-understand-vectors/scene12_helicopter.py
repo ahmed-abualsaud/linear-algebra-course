@@ -110,6 +110,6 @@ def play_scene12(scene: Scene, keep_drawing: bool = False):
     _exit_all(scene, st, hud_outs, extra=extra)
 
 
-class Scene12(ThreeDScene):
+class Dev(ThreeDScene):
     def construct(self):
         play_scene12(self, keep_drawing=False)

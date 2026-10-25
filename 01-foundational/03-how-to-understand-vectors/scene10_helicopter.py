@@ -163,6 +163,6 @@ def play_scene10(scene: Scene, keep_drawing: bool = True):
     scene.wait(1.2)
 
 
-class Scene10(ThreeDScene):
+class Dev(ThreeDScene):
     def construct(self):
         play_scene10(self, keep_drawing=False)

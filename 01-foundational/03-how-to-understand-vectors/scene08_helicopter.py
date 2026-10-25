@@ -286,6 +286,6 @@ def play_scene08(scene: Scene):
     }
 
 
-class Scene08(ThreeDScene):
+class Dev(ThreeDScene):
     def construct(self):
         play_scene08(self)

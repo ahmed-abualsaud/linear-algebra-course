@@ -340,3 +340,8 @@ def play_scene04(scene):
     scene.wait(0.8)
 
     # المجموع: 2.5 + 2.5 + 2.5 + 5.0 + 4.5 + 2.0 = 19.0 ثانية بالتمام والكمال!
+
+
+class Dev(ThreeDScene):
+    def construct(self):
+        play_scene04(self)

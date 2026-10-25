@@ -545,3 +545,8 @@ def play_scene06(scene: Scene):
         scene.renderer.camera.remove_fixed_in_frame_mobjects(*_frame_mobs)
 
     # المجموع: 3.0 + 2.5 + 3.5 + 5.5 + 1.5 + 16.5 + 2.0 = 36.0 ثانية بالتمام والكمال!
+
+
+class Dev(ThreeDScene):
+    def construct(self):
+        play_scene06(self)
