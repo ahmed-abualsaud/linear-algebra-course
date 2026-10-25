@@ -22,8 +22,8 @@ def play_scene05(scene):
     # 2. بالونة التفكير
     # ==============================================================
 
-    box, dots, mark = thought_bubble(
-        text=r"! \ ?",
+    box, dots, mark, _, _ = thought_bubble(
+        text=r"! ?",
         anchor_head=thinker[0],
         color=GOLD_LIGHT,
         text_color=COPPER_TERRA,
