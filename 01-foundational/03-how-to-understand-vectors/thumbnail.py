@@ -17,8 +17,8 @@ from common.mobjects.coordinate_systems import MachAxes3D
 from common.mobjects.helicopter import make_helicopter
 
 # ---------------- إعدادات سريعة ----------------
-TITLE_LINE1 = "ما هو"
-TITLE_LINE2 = "المتجه؟"
+TITLE_LINE1 = "أمثلة لتوضيح"
+TITLE_LINE2 = "المتجهات"
 BADGE_TEXT = "الجبر الخطي • الحلقة 03"
 
 # نفس الحركة بثلاث قوائم مختلفة (المتر، السنتيمتر، الخشبة مع الزمن)
@@ -46,14 +46,40 @@ def _ar(txt, size=22, color=IVORY_WHITE, bold=False):
     return MarkupText(body, font="Cairo", font_size=size, color=color)
 
 
+def _round_joints(mob):
+    for sm in mob.family_members_with_points():
+        sm.joint_type = LineJointType.ROUND
+    return mob
+
+
+def solid_text(text, width, color_a=IVORY_WHITE, color_b=GOLD_BRIGHT, glow=GOLD_LIGHT,
+               stroke_w=0.7, outline_w=2.4, halo_w=(9, 4)):
+    """نص عربي عريض بحدود خفيفة متناسبة مع العرض عشان الحروف ما تلزقش في بعض."""
+    main = MarkupText(f"<b>{text}</b>", font=THUMB_FONT, font_size=96)
+    if len(main.family_members_with_points()) == 0:
+        main = Text(text, font=THUMB_FONT, font_size=96, weight=BOLD)
+    main.set(width=width)
+    main.set_color_by_gradient(color_a, color_b)
+    for sm in main.family_members_with_points():
+        sm.set_stroke(sm.get_fill_color(), width=stroke_w, opacity=1)
+    _round_joints(main)
+    outline = _round_joints(main.copy().set_fill(opacity=0).set_stroke(THUMB_BG, width=outline_w, opacity=0.9))
+    halo = VGroup(
+        main.copy().set_fill(opacity=0).set_stroke(glow, width=halo_w[0], opacity=0.07),
+        main.copy().set_fill(opacity=0).set_stroke(glow, width=halo_w[1], opacity=0.11),
+    )
+    _round_joints(halo)
+    return VGroup(halo, outline, main)
+
+
 class Episode03Thumbnail(ThreeDScene):
     def construct(self):
         self.camera.background_color = THUMB_BG
 
         # 1. المنظور ثلاثي الأبعاد
         self.set_camera_orientation(
-            phi=68 * DEGREES, 
-            theta=-55 * DEGREES, 
+            phi=68 * DEGREES,
+            theta=-55 * DEGREES,
             gamma=-4 * DEGREES
         )
 
@@ -81,9 +107,9 @@ class Episode03Thumbnail(ThreeDScene):
         heli = make_helicopter(scale=0.74)
         climb = np.arctan2(MOVE[2], np.hypot(MOVE[0], MOVE[1]))
         heli.set_pose(
-            goal, 
-            heading=float(np.arctan2(MOVE[1], MOVE[0])), 
-            bank=0.0, 
+            goal,
+            heading=float(np.arctan2(MOVE[1], MOVE[0])),
+            bank=0.0,
             pitch=0.12 - 0.6 * climb
         )
 
@@ -138,21 +164,31 @@ class Episode03Thumbnail(ThreeDScene):
         # شخصية عالم الرياضيات على اليسار
         glow, char = mathematician_with_glow()
 
-        # كتلة العنوان
-        title = title_block(TITLE_LINE1, TITLE_LINE2, BADGE_TEXT, line1_width=2.9, line2_width=5.2)
-        title.set_z_index(30)
+        # كتلة العنوان (رفعنا line1_width من 2.9 إلى 3.9 + حروف أنضف بـ solid_text)
+        title = title_block(TITLE_LINE1, TITLE_LINE2, BADGE_TEXT, line1_width=3.9, line2_width=5.2)
 
-        # وسم (الجزء الثاني)
-        part_tag = Text(
-            "الجزء الثاني",
-            font=THUMB_FONT,
-            font_size=24,
-            weight=SEMIBOLD,
-            color=COPPER_TERRA,
-        )
-        part_tag.set_stroke(THUMB_BG, width=2.5, background=True)
-        part_tag.next_to(title[3], DOWN, buff=0.18).align_to(title[3], RIGHT).shift(LEFT * 0.18)
-        part_tag.set_z_index(30)
+        def _pick_text_mob(m):
+            if isinstance(m, VGroup) and len(m) > 1 and len(m[1].family_members_with_points()) > 0:
+                return m[1]
+            return m
+
+        old_l2 = _pick_text_mob(title[2])
+        new_l2 = solid_text(TITLE_LINE2, old_l2.width, GOLD_BRIGHT, GOLD, glow=GOLD,
+                            stroke_w=1.5, outline_w=7, halo_w=(18, 9))
+        new_l2.move_to(old_l2.get_center())
+        title.submobjects[2] = new_l2
+
+        old_l1 = _pick_text_mob(title[1])
+        new_l1 = solid_text(TITLE_LINE1, old_l1.width, IVORY_WHITE, GOLD_BRIGHT, glow=GOLD_LIGHT,
+                            stroke_w=0.7, outline_w=2.4, halo_w=(9, 4))
+        new_l1.next_to(new_l2, UP, buff=0.34).align_to(new_l2, RIGHT)
+        title.submobjects[1] = new_l1
+
+        # تأكيد إن الـ badge فوق السطر الأول بمسافة مريحة
+        if title[0].get_bottom()[1] < new_l1.get_top()[1] + 0.20:
+            title[0].next_to(new_l1, UP, buff=0.24).align_to(new_l1, RIGHT)
+
+        title.set_z_index(30)
 
         # ---------------- القوائم الثلاث مع القوس وعلامة المساواة ----------------
         rows = VGroup()
@@ -167,8 +203,12 @@ class Episode03Thumbnail(ThreeDScene):
         rows[2].set(width=LIST_WIDTH + 1.20)
         rows.arrange(DOWN, buff=0.28, aligned_edge=RIGHT)
 
-        # موضع القوائم تحت وسم (الجزء الثاني) ومحاذاة لليمين
-        rows.next_to(part_tag, DOWN, buff=0.30).align_to(title[3], RIGHT).shift(LEFT * 0.12)
+        # موضع القوائم تحت العنوان ومحاذاة لليمين
+        rows.next_to(
+            title,
+            DOWN,
+            buff=0.30
+        ).align_to(title[3], RIGHT).shift(LEFT * 0.12)
         for r in rows:
             r.set_z_index(30)
 
@@ -181,6 +221,14 @@ class Episode03Thumbnail(ThreeDScene):
         eq.next_to(brace, LEFT, buff=0.14).set_z_index(30)
 
         # تسجيل جميع عناصر الـ HUD وتثبيتها
-        hud_elements = [frame, brand, glow, char, title, part_tag, rows, brace, eq]
+        hud_elements = [
+            frame,
+            brand,
+            glow,
+            char, title,
+            rows,
+            brace,
+            eq
+        ]
         _hud(self, *hud_elements)
         self.add(*hud_elements)
