@@ -19,6 +19,32 @@ O = np.array([-1.55, -2.65, 0.0])
 HERO = O + np.array([6 * 0.8, 2 * 0.8, 0.0])  # على تقاطع خطوط الشبكة
 
 
+def _round_joints(mob):
+    for sm in mob.family_members_with_points():
+        sm.joint_type = LineJointType.ROUND
+    return mob
+
+
+def solid_text(text, width, color_a=IVORY_WHITE, color_b=GOLD_BRIGHT, glow=GOLD_LIGHT,
+               stroke_w=0.7, outline_w=2.4, halo_w=(9, 4)):
+    """نص عربي عريض بحدود خفيفة متناسبة مع العرض عشان الحروف ما تلزقش في بعض."""
+    main = MarkupText(f"<b>{text}</b>", font=THUMB_FONT, font_size=96)
+    if len(main.family_members_with_points()) == 0:
+        main = Text(text, font=THUMB_FONT, font_size=96, weight=BOLD)
+    main.set(width=width)
+    main.set_color_by_gradient(color_a, color_b)
+    for sm in main.family_members_with_points():
+        sm.set_stroke(sm.get_fill_color(), width=stroke_w, opacity=1)
+    _round_joints(main)
+    outline = _round_joints(main.copy().set_fill(opacity=0).set_stroke(THUMB_BG, width=outline_w, opacity=0.9))
+    halo = VGroup(
+        main.copy().set_fill(opacity=0).set_stroke(glow, width=halo_w[0], opacity=0.07),
+        main.copy().set_fill(opacity=0).set_stroke(glow, width=halo_w[1], opacity=0.11),
+    )
+    _round_joints(halo)
+    return VGroup(halo, outline, main)
+
+
 class Episode02Thumbnail(Scene):
     def construct(self):
         self.camera.background_color = THUMB_BG
@@ -31,7 +57,7 @@ class Episode02Thumbnail(Scene):
         step = 0.8
         gx0, gx1 = -3.3, 6.5
         gy0, gy1 = -3.55, 1.55  # يبدأ من -1 أسفل الأصل وينتهي بأمان
-        
+
         # شبكة رئيسية: خطوط متصلة تتلاشى تدريجيًا بعيدًا عن الأصل (زي الحلقة 01)
         grid = VGroup()
         for k in range(-5, 12):
@@ -97,7 +123,7 @@ class Episode02Thumbnail(Scene):
         arc = Arc(radius=1.10, start_angle=0, angle=ang, arc_center=O, color=COPPER_TERRA, stroke_width=3.4)
         theta = MathTex(r"\theta", tex_template=mach_math_template, font_size=46, color=COPPER_TERRA)
         theta.move_to(O + 1.60 * np.array([np.cos(ang / 2), np.sin(ang / 2), 0]))
-        
+
         # رمز المتجه بجوار رأس السهم بأريحية كاملة
         hero_label = MathTex(r"\vec{v}", tex_template=mach_math_template, font_size=96, color=GOLD_BRIGHT)
         hero_label.next_to(HERO, RIGHT + DOWN * 0.12, buff=0.10)
@@ -110,29 +136,30 @@ class Episode02Thumbnail(Scene):
         # الشخصية
         self.add(*mathematician_with_glow())
 
-        # العنوان في مكانه القياسي الطبيعي (داخل الإطار العلوي بأمان)
-        title = title_block(TITLE_LINE1, TITLE_LINE2, BADGE_TEXT, line2_width=5.2)
+        # العنوان في مكانه القياسي الطبيعي (بنفس طريقة solid_text النظيفة بدون تلاصق)
+        title = title_block("قواعد", TITLE_LINE2, BADGE_TEXT, line1_width=2.7, line2_width=5.2)
+
+        def _pick_text_mob(m):
+            if isinstance(m, VGroup) and len(m) > 1 and len(m[1].family_members_with_points()) > 0:
+                return m[1]
+            return m
+
+        old_l2 = _pick_text_mob(title[2])
+        new_l2 = solid_text(TITLE_LINE2, old_l2.width, GOLD_BRIGHT, GOLD, glow=GOLD,
+                            stroke_w=1.5, outline_w=7, halo_w=(18, 9))
+        new_l2.move_to(old_l2.get_center())
+        title.submobjects[2] = new_l2
+
+        old_l1 = _pick_text_mob(title[1])
+        new_l1 = solid_text(TITLE_LINE1, old_l1.width, IVORY_WHITE, GOLD_BRIGHT, glow=GOLD_LIGHT,
+                            stroke_w=0.7, outline_w=2.4, halo_w=(9, 4))
+        new_l1.next_to(new_l2, UP, buff=0.34).align_to(new_l2, RIGHT)
+        title.submobjects[1] = new_l1
+
+        if title[0].get_bottom()[1] < new_l1.get_top()[1] + 0.20:
+            title[0].next_to(new_l1, UP, buff=0.24).align_to(new_l1, RIGHT)
+
         title.set_z_index(30)
         brand = brand_mark().set_z_index(30)
 
-        # ---------------- إضافة (الجزء الأول) بتنسيق نقي ----------------
-        # MarkupText بدل Text: Text بيرجّع شكل فاضي مع بعض نصوص العربي القصيرة
-        part_tag = MarkupText(
-            '<span weight="600">الجزء الأول</span>',
-            font=THUMB_FONT,
-            font_size=24,
-            color=COPPER_TERRA,
-        )
-        part_tag.set_stroke(THUMB_BG, width=2.5, background=True)
-        # نبحث عن الخط التحتي بالشكل (VGroup من خطّين) بدل الاعتماد على ترتيب ثابت
-        underline = next(
-            (m for m in title if len(m.submobjects) == 2 and all(isinstance(x, Line) for x in m.submobjects)),
-            None,
-        )
-        if underline is not None:
-            part_tag.next_to(underline, DOWN, buff=0.18).align_to(underline, RIGHT).shift(LEFT * 0.18)
-        else:  # احتياطي: موضع ثابت تحت العنوان
-            part_tag.move_to([TITLE_CX + 2.4 - part_tag.width / 2, -0.78, 0])
-        part_tag.set_z_index(30)
-
-        self.add(title, brand, part_tag)
+        self.add(title, brand)
