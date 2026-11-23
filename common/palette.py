@@ -12,15 +12,15 @@ GOLD_MUTED  = "#6E5B24"
 GOLD_SHADOW = "#221A02"
 
 # ---- الألوان المضيئة الناصعة (المتجهات والنصوص) ----
-COPPER_TERRA = "#FF7043"  # برتقالي ساطع ومضيء جداً للمتجه a
-BRONZE       = "#FFD54F"  # أصفر ذهبي مشرق للمتجه v
-SANDSTONE    = "#FFFFFF"  # أبيض ناصع 100%
-IVORY_WHITE  = "#FFFFFF"  # أبيض ناصع 100%
+COPPER_TERRA = "#FF7043"
+BRONZE       = "#FFD54F" 
+SANDSTONE    = "#FFFFFF" 
+IVORY_WHITE  = "#FFFFFF" 
 
 # ---- النصوص الفرعية الخافتة ----
-LABEL_MUTED  = "#DCD6CD"  # لون فرعي هادئ ومقروء للنصوص الثانوية
+LABEL_MUTED  = "#DCD6CD" 
 
 # ---- خطوط المحاور والإسقاطات ----
-STONE_AXIS   = "#B0A89C"  # محاور منورة وفاتحة وواضحة جداً
-STONE_DASH   = "#8D8271"  # خطوط إسقاط واضحة
+STONE_AXIS   = "#B0A89C" 
+STONE_DASH   = "#8D8271"
 TEAL         = "#4FA7A0"
